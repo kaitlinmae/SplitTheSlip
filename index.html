@@ -151,6 +151,8 @@ label.linkbtn{display:inline-flex;align-items:center;font-size:14px}
 .w-scan{width:100%;justify-content:center;min-height:54px;font-size:17px;gap:8px}
 .w-trust{margin:12px 0 0;color:var(--quiet);font-size:13px}
 .linkbtn.quiet{color:var(--quiet);font-weight:500}
+.startnote{display:flex;flex-wrap:wrap;align-items:center;gap:4px 12px}
+.startnote .linkbtn{padding:0;font-size:13.5px}
 .everyone{border:1.5px dashed var(--accent)!important;background:transparent!important;color:var(--accent-text)!important}
 .everyone[aria-pressed=true]{background:var(--accent-text)!important;border-style:solid!important;color:var(--chip-on-ink)!important}
 body.has-bar .wrap{padding-bottom:132px}
@@ -211,7 +213,7 @@ textarea.fallback{width:100%;min-height:120px;margin-top:8px;font:13px "IBM Plex
  <p class="status topstatus" id="scanStatus" aria-live="polite"></p>
  <div class="choice" id="scanChoice" role="group" aria-label="Add or replace scanned items" hidden></div>
  <p class="undo" id="undoBar" role="status" hidden><span id="undoMsg">Bill cleared.</span> <button type="button" class="linkbtn" id="undoBtn">Undo</button></p>
- <p class="sample" id="sampleNote">Showing a sample dinner. Tap “New bill” to start your own.</p>
+ <p class="sample startnote" id="sampleNote"><button type="button" class="linkbtn" id="backStart">← Back to start</button><span id="sampleText">Showing a sample dinner. Tap “New bill” to start your own.</span></p>
 
  <section class="slip" aria-labelledby="h-people">
   <h2 id="h-people"><span class="n">1</span>People</h2>
@@ -420,7 +422,8 @@ function renderTotals(){
     $('oweMain').textContent = shown.length ? shown.map(x=>`${x.name} ${money(x.total)}`).join(' · ') : 'Add someone to split with';
     $('oweSub').textContent = nU ? `${nU} item${nU>1?'s':''} not assigned yet` : payer ? `${payer.name} paid · updates as you tap` : 'Tap ★ to mark who paid';
   }
-  $('sampleNote').hidden = !S.sample;
+  // "Back to start" shows until the visitor starts a bill of their own (example, or a blank bill)
+  $('sampleNote').hidden = !isFresh(S); $('sampleText').hidden = !S.sample;
 }
 function renderAll(){ renderItems(); fitAllNames(); renderPeople(); renderSettings(); renderTotals(); save(); }
 const touch = () => { if(S.sample){ S.sample=false; } };
@@ -471,6 +474,7 @@ function showWelcome(){ $('welcome').hidden=false; $('app').hidden=true; $('oweb
 function hideWelcome(){ if($('welcome').hidden) return; $('welcome').hidden=true; $('app').hidden=false; renderAll(); window.scrollTo(0,0); }
 $('wType').addEventListener('click', ()=>{ S = BLANK(); hideWelcome(); $('personName').focus(); });
 $('wExample').addEventListener('click', ()=>{ S = SAMPLE(); hideWelcome(); });
+$('backStart').addEventListener('click', ()=>{ S = BLANK(); save(); hideUndo(); status(''); $('scanCheer').hidden = true; $('scanChoice').hidden = true; showWelcome(); window.scrollTo(0,0); });
 
 // ---- send sheet ----
 let lastFocus = null;
