@@ -20,7 +20,7 @@ Every release from the first build to v1.0, newest first. Testers should reload 
 | 0.7 | Nov 26 | Group-chat text stays in sync with edits and flashes on change |
 | 0.6 | Nov 26 | Shorter group-chat message: "food tab, $105 total paid by Alex:" |
 | 0.5 | Nov 26 | Pastel, minimal restyle |
-| 0.4 | Nov 24 | Installable web app (PWA) zip, not published: on-device OCR with the scanner bundled for offline use, share sheet, home-screen icon, offline cache; fixed off-centre scan button |
+| 0.4 | Nov 24 | Installable web app (PWA) zip, never published and later discarded: on-device OCR with the scanner bundled for offline use, share sheet, home-screen icon, offline cache; fixed off-centre scan button |
 | 0.3 | Nov 24 | Fixed "New bill" button text wrapping onto two lines |
 | 0.2 | Nov 24 | First build as a Claude artifact (thermal-receipt style): scan with Claude, tap to assign, shared items, tax and tip, per-person breakdown, copy summary; 20,000 random bills tested with 0 rounding mismatches |
 | 0.1 | Nov 24 | MVP PRD written after the requirements session |

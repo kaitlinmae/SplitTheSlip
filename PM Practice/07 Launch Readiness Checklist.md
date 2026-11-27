@@ -42,6 +42,6 @@ v1.0 is live and ready for friends-and-family use; a wider public launch waits o
 - [ ] Validate the problem with 3 to 5 friend interviews ("Last time we split a bill, what was annoying about it?")
 - [ ] Time a real split with a stopwatch: under 1 minute against the 5-minute baseline?
 - [ ] Send testers the three questions: scanned items right, totals fair, use it next time
-- [ ] Decide the tax default (Even now vs Proportional on Nov 24) from tester answers
-- [ ] Decide whether to bring back offline mode and the home-screen icon from the v2 PWA zip
+- [x] Decided: tax and tip both default to Even (Nov 26)
+- [x] Decided: keep the GitHub version as the only codebase; the v2 PWA zip is discarded (Nov 26)
 - [ ] Keep the link name (kaitlinmae.github.io/SplitTheSlip) fixed once shared, since renaming breaks installed copies

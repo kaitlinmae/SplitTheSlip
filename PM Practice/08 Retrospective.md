@@ -21,8 +21,8 @@ v1.0 went from a vague idea (Nov 24) to a live, tested app (Nov 26); the biggest
 - **Caching confused testing.** Twice, "it's not updating" was the phone or the Claude app showing an old copy, which cost debugging time.
 - **Default behaviour was misjudged.** Proportional as the default, with tax and tip showing $0.00 until items were assigned, read as broken to the owner.
 - **Licensing intent needed untangling.** "MIT and all rights reserved" were contradictory; clarifying the real goal took an extra round.
-- **Two builds drifted apart.** The Nov 24 PWA zip (offline, bundled scanner, home-screen icon) and the Nov 26 single-file app evolved separately, and the published version lost offline mode.
-- **A decision was reversed without revisiting its reason.** Even became the default on Nov 26 without weighing the Nov 24 fairness argument for Proportional tax.
+- **Two builds drifted apart.** The Nov 24 PWA zip (offline, bundled scanner, home-screen icon) and the Nov 26 single-file app evolved separately. The owner chose to keep the GitHub version and discard the zip, giving up offline mode for one codebase.
+- **A decision was reversed without revisiting its reason.** Even became the default on Nov 26 without weighing the Nov 24 fairness argument for Proportional tax. Once the earlier reasoning resurfaced, the owner revisited it and confirmed Even for both tax and tip.
 - **First prioritization said "all is a must".** It took a 6-of-10 constraint to force real cuts and reasons.
 
 ## Lessons and action items
@@ -57,5 +57,4 @@ v1.0 went from a vague idea (Nov 24) to a live, tested app (Nov 26); the biggest
 - [ ] Add an older iPhone and an Android phone to the release checklist
 - [ ] Put a "private tab" testing note at the top of every release note
 - [ ] Run a short preview or mockup before any change to defaults or layout
-- [ ] Merge the PWA zip's offline features into the published app, so there is one codebase
 - [ ] Before reversing a decision, reread its original reason in the decision log

@@ -53,7 +53,7 @@ The growth audit found the product is strong but the first screen sells none of 
 | Link preview and home-screen icon | Now | Shared links look bare, so fewer friends tap through |
 | One step at a time | Next | Four stacked cards feel like a form |
 | Scanning screen with a clear result | Next | A small grey status line doesn't build trust |
-| Preload the photo reader, restore offline mode | Next | First scan waits on a several-MB download; the Nov 24 PWA zip already bundled the scanner and an offline cache |
+| Preload the photo reader | Next | First scan waits on a several-MB download |
 | Icon and spacing polish | Next | Mixed symbols and four step colours look AI-made |
 | Assign by person | Next | Item-by-item tapping is slow for big groups |
 | Tester survey and in-app "Did these totals look right?" prompt | Next | The scan-accuracy, trust and retention targets can't be checked without them |

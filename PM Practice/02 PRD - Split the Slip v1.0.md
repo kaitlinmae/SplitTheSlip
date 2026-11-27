@@ -96,7 +96,7 @@ flowchart LR
 - **Proportional** splits tax and tip by each person's share of assigned items; tax and tip on unassigned items are charged to no one until they're assigned.
 - Totals use largest-remainder rounding, so shares always add up to the exact cent (a $6.50 dish three ways is $2.17, $2.17, $2.16).
 
-**Open tension: the tax default.** On Nov 24 the default for tax and tip was set to Proportional after user pushback ("I had a $12 salad and Jake had a $45 steak. Why am I paying the same tax as him?"). On Nov 26 the owner made Even the default, because Proportional showed $0.00 until items were assigned and read as broken. Even is now simpler but overcharges light orderers on tax; a middle option is tax Proportional, tip Even. To decide with tester feedback.
+**Decision: Even by default for tax and tip.** On Nov 24 the default was set to Proportional after user pushback ("I had a $12 salad and Jake had a $45 steak. Why am I paying the same tax as him?"). On Nov 26 the owner revisited that reasoning and chose Even for both: it's what most groups do, it works the moment a receipt is scanned, and anyone who wants fairness by order can switch to Proportional in one tap.
 
 **Receipt scanning**
 
@@ -140,7 +140,6 @@ The 1-minute target must be defensible ("why that number?"); the 5-minute baseli
 **Open questions**
 
 - [ ] Validate the problem with 3 to 5 friends outside the owner's group
-- [ ] Tax default: Even (current), Proportional (Nov 24 call), or tax Proportional with tip Even?
 - [ ] Is 1 minute the right target, and can testers hit it with scanning plus fixes?
 - [ ] Is repayment (payment links) the bigger pain? Decide v2 priority from launch data
 - [ ] Should the group message carry an optional "Split with Split the Slip" link?

@@ -2,12 +2,14 @@
 
 Nov 26, 2026 · Kaitlin Mae Frani
 
-28 product and technical decisions from the Nov 24 requirements session and the Nov 26 build, newest first, with the options weighed and the reason for each. Decision #28 reverses #6, and the tax default is still an open question.
+30 product and technical decisions from the Nov 24 requirements session and the Nov 26 build, newest first, with the options weighed and the reason for each. Decision #28 reversed #6, and #29 confirmed it after the owner revisited the original reasoning.
 
 ## Decisions
 
 | # | Date | Decision | Options considered | Why |
 | --- | --- | --- | --- | --- |
+| 30 | Nov 26 | Keep the GitHub version as the only codebase; discard the v2 PWA zip | Merge the zip's offline mode, bundled scanner and home-screen icon into the GitHub version | The GitHub version has every fix since Nov 24; one codebase is simpler than merging two |
+| 29 | Nov 26 | Confirm Even as the default for both tax and tip, after revisiting #6 | Proportional for both (Nov 24); tax Proportional with tip Even | Most groups split evenly and it works the moment a receipt is scanned; Proportional stays one tap away for anyone who wants it |
 | 28 | Nov 26 | Even becomes the default split for tax and tip, applied straight away (reverses #6) | Keep Proportional default; tax Proportional with tip Even | Proportional showed $0.00 after a scan and read as broken; fairness to light orderers is now an open question |
 | 27 | Nov 26 | Scanned tip keeps the receipt's form (% or $) | Always convert to $ | Matches what the receipt says; less re-typing |
 | 26 | Nov 26 | Tip from Amount/Tip/Payment rows = paid total minus bill total | Read the tip digits directly | Robust to a misread digit (16.77 read as 18.77) |
@@ -20,7 +22,7 @@ Nov 26, 2026 · Kaitlin Mae Frani
 | 19 | Nov 26 | Copy button off until every item is assigned | Allow copy with a warning | Prevents sending wrong totals to the group |
 | 18 | Nov 26 | Short group-chat message: "food tab, $105 total paid by Alex:" | "Dinner split… Sam owes Alex $23.95" | Owner's requested format; fits a text bubble |
 | 17 | Nov 26 | Pastel, minimal visual style | Thermal-receipt style with tomato-red accent | Owner preference; calmer, cleaner |
-| 16 | Nov 26 | Publish the single-file version to GitHub, not the v2 PWA zip (implicit) | Upload the PWA zip from Nov 24 | It carried the later fixes; tradeoff: no offline mode, bundled scanner or home-screen icon yet |
+| 16 | Nov 26 | Publish the single-file version to GitHub, not the v2 PWA zip (confirmed by #30) | Upload the PWA zip from Nov 24 | It carried the later fixes; tradeoff: no offline mode, bundled scanner or home-screen icon yet |
 | 15 | Nov 24 | App Store: not yet | Native iPhone app now | $99/year, a Mac and review cycles; Guideline 4.2 risk; validate with friends first |
 | 14 | Nov 24 | Host on GitHub Pages from a public repo | Netlify; private repo with GitHub Pro | Free, friends need only a link, and a public repo doubles as a portfolio piece |
 | 13 | Nov 24 | Installable web app (PWA) for the friends test | Home-screen link to the Claude artifact; native app | Works for anyone on any phone; a Claude link would test who has Claude, not the product |
