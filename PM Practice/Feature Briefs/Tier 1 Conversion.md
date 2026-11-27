@@ -27,6 +27,8 @@ Effort is a build estimate (S = under an hour, M = a few hours including testing
 
 The app link (C1) is on by default, per the owner's choice on Nov 26. On Nov 27 the message itself was changed to "🧾 The split is in! Kaitlin paid $124.02", followed by each person's amount (decision #35). Send opens a short screen to check the message before sharing, with Copy as a backup.
 
+**Added Nov 27: F · Mascot (Penny).** An original pastel-lavender blob with a leaf sprout, holding a receipt with a green check. She appears on the first screen, celebrates a finished scan ("All 5 items found!"), waves on the send screen, and a simplified version becomes the home-screen and link-preview icon. Effort S. A licensed character (Miffy) was considered and ruled out, since the app has no rights to it (decision #36).
+
 ## Proposed prioritization
 
 Proposed order: A, B, C1, E as one release; D and C2 held for discussion. Scores are a starting point for that discussion, not data.
