@@ -13,4 +13,8 @@ Product management docs for **Split the Slip**, kept through the build from firs
 | 07 | [Launch Readiness Checklist](07%20Launch%20Readiness%20Checklist.md) | What's done for v1.0 and what's left before a wider launch |
 | 08 | [Retrospective](08%20Retrospective.md) | What went well, what didn't, lessons, interview stories and action items |
 
+**Feature Briefs** — proposals that are talked through and prioritized before building:
+
+- [Tier 1 Conversion](Feature%20Briefs/Tier%201%20Conversion.md): first screen, sticky totals bar, share and app link, payment requests, even split, link preview (proposed)
+
 Copyright (c) 2026 Kaitlin Mae Frani. All rights reserved. See [LICENSE](../LICENSE).
