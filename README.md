@@ -37,6 +37,10 @@ node --test
 
 They need Node.js 18 or later.
 
+## Product docs
+
+The PRD, roadmap, decision log, bug log, release notes, launch checklist and retrospective from building this app are in [PM Practice](PM%20Practice/README.md).
+
 ## Copyright and license
 
 Copyright (c) 2026 Kaitlin Mae Frani. All rights reserved.
