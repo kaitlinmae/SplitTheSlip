@@ -265,3 +265,28 @@ test('parser: a bare amount just above the subtotal counts as the bill total', (
   assert.equal(r.tax, 11.31);
   assert.equal(r.items.length, 1);
 });
+
+test('parser: all-you-can-eat receipt — $0.00 items skipped, misread subtotal and garbled total handled', () => {
+  const r = parseReceipt(`1 Strawberry Soju $12.00
+2 Premiums $110.00
+1 Salmon Crudo $0.00
+1 Hamachi Jala $0.00
+total $122.00
+( $11.29
+i] $133.29`);
+  assert.deepEqual(r.items.map(i => [i.name, i.price]), [['1 Strawberry Soju', 12], ['2 Premiums', 110]]);
+  assert.equal(r.subtotal, 122);
+  assert.equal(r.tax, 11.29);
+});
+
+test('parser: a garbled "Total" label never becomes an item', () => {
+  const r = parseReceipt('1 Soju $12.00\n2 Premium $110.00\nSubtota] $122.00\nTax $11.29\nTota $133.29');
+  assert.deepEqual(r.items.map(i => i.name), ['1 Soju', '2 Premium']);
+  assert.equal(r.subtotal, 122);
+  assert.ok(r.totals.includes(133.29));
+});
+
+test('parser: a food item whose price equals the items above it is still an item', () => {
+  const r = parseReceipt('Fries 10.00\nSoda 10.00\nBig Platter 20.00\nSubtotal 40.00');
+  assert.deepEqual(r.items.map(i => i.name), ['Fries', 'Soda', 'Big Platter']);
+});

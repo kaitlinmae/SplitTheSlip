@@ -2,12 +2,13 @@
 
 Nov 26, 2026 · Kaitlin Mae Frani
 
-36 product and technical decisions from the Nov 24 requirements session, the Nov 26 build and the Tier 1 feature brief, newest first, with the options weighed and the reason for each. Decision #28 reversed #6, and #29 confirmed it after the owner revisited the original reasoning.
+37 product and technical decisions from the Nov 24 requirements session, the Nov 26 build and the Tier 1 feature brief, newest first, with the options weighed and the reason for each. Decision #28 reversed #6, and #29 confirmed it after the owner revisited the original reasoning.
 
 ## Decisions
 
 | # | Date | Decision | Options considered | Why |
 | --- | --- | --- | --- | --- |
+| 37 | Nov 27 | Skip $0.00 items when scanning | Keep them as items to assign | They don't change anyone's share, and every item must be assigned before Send, so 14 free all-you-can-eat lines would block sending |
 | 36 | Nov 27 | Original mascot "Penny", a pastel blob holding a receipt, on the first screen, scan result, send screen and app icon | A licensed character (Miffy); "Splitz" the coin; no mascot | The app has no rights to licensed characters; Penny is owned outright and fits the pastel style |
 | 35 | Nov 27 | New group-chat message: "🧾 The split is in! Kaitlin paid $124.02" (replaces #18) | "Paying Kaitlin back ($124.02 bill):"; "Bill split · $124.02 · Kaitlin paid"; "Send Kaitlin your share of the $124.02 bill:" | Warmer and more casual for group chats; doesn't name a meal, so it fits lunch, brunch or drinks |
 | 34 | Nov 26 | Ship the first screen, sticky totals bar, share sheet with app link, link preview and Everyone chip as one release | One feature at a time, in rank order | They work as a set, and with no analytics they can't be measured one at a time anyway |

@@ -8,6 +8,7 @@ Every release from the first build to v1.0, newest first. Testers should reload 
 
 | Version | Date | What changed |
 | --- | --- | --- |
+| 1.1.4 | Nov 27 | Recognises the subtotal by its maths (a line equal to the items above it), catches garbled "Total" labels so the total is never added as an item, and skips $0.00 items such as all-you-can-eat lines; tuned on a third real receipt |
 | 1.1.3 | Nov 27 | Reads receipts at any angle (tilted and sideways), finds the paper by colour so wooden tables aren't read, judges colour against the room's lighting, joins item names that wrap onto two lines, drops capital-letter scraps ("SER"), and works out tax from total minus subtotal when it's misread or missing; tuned on a second real receipt |
 | 1.1.2 | Nov 27 | Example bill shows a pinned banner with Penny and a clear "← Back to start" button; tapping names, Everyone, ★ or tax and tip keeps it an example, adding or editing people or items makes it your own bill (owner feedback) |
 | 1.1.1 | Nov 27 | "← Back to start" link returns to the first screen from the example or a blank bill (owner feedback) |

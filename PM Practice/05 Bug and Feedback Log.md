@@ -6,10 +6,11 @@ Every issue found through owner testing and the release review, with its root ca
 
 ## Issues
 
-18 of 22 issues are fixed, 2 low-severity items are still open, and 2 reports turned out not to be bugs. Issues 1 and 2 come from the Nov 24 build; the rest from Nov 26 testing and review.
+19 of 23 issues are fixed, 2 low-severity items are still open, and 2 reports turned out not to be bugs. Issues 1 and 2 come from the Nov 24 build; the rest from Nov 26 testing and review.
 
 | # | Issue | Root cause | Fix | Severity | Status |
 | --- | --- | --- | --- | --- | --- |
+| 23 | Total added as an item; app showed $255.29 instead of $133.29 | "Subtotal" misread as "total" and a garbled "Total" label read as a food name | Subtotal recognised by its maths; fuzzy total labels; nothing below the subtotal becomes an item | High | Fixed |
 | 22 | Second real receipt read as noise; "SER" shown as an item | Receipt tilted about 20° plus sideways; light wooden table treated as paper; fixed-width font lines up in columns too | Search every angle, try a quarter turn, find paper by colour against the lighting, drop capital scraps | High | Fixed |
 | 21 | No way back to the first screen from the example | No link or button back | Pinned "Example bill" banner with "← Back to start" | Medium | Fixed |
 | 20 | Breakdown lines can differ by a cent from a person's Items total | Each line rounds on its own; the total uses exact allocation | Show each person's exact cent share per line | Low | Open |
