@@ -69,9 +69,15 @@ label.linkbtn{display:inline-flex;align-items:center;font-size:14px}
 .item:first-child{border-top:0}
 .item.unassigned .iname{box-shadow:inset 3px 0 0 var(--warnbar);padding-left:8px}
 .item.unassigned .chips::before{content:"⚠ Unassigned";flex-basis:100%;font-size:12.5px;font-weight:600;color:var(--warn)}
-.itop{display:grid;grid-template-columns:minmax(0,1fr) 96px 36px;gap:8px;align-items:center}
-.itop input{width:100%;min-height:40px;border:1px solid transparent;border-radius:10px;background:transparent;padding:4px 6px;font-size:16px}
-.itop input:hover,.itop input:focus{border-color:var(--rule);background:var(--chip)}
+.itop{display:grid;grid-template-columns:minmax(0,1fr) 96px 36px;gap:8px;align-items:start}
+.itop input,.itop textarea{width:100%;min-height:40px;border:1px solid transparent;border-radius:10px;background:transparent;padding:8px 6px;font:inherit;font-size:16px;line-height:1.35;color:inherit}
+.itop textarea{display:block;resize:none;overflow:hidden;overflow-wrap:anywhere;height:40px}
+.itop input:hover,.itop input:focus,.itop textarea:hover,.itop textarea:focus{border-color:var(--rule);background:var(--chip)}
+.itop .del{margin-top:2px}
+.brk div{align-items:flex-start}
+.brk div>span:first-child{overflow-wrap:anywhere}
+.brk .price{padding-left:8px;flex:none}
+.brk div>span:first-child .muted{white-space:nowrap}
 .itop input.price{text-align:right}
 .del{width:36px;height:36px;border-radius:50%;border:0;background:transparent;color:var(--quiet);cursor:pointer;font-size:20px;line-height:1}
 .del:hover{background:var(--chip);color:var(--accent)}
@@ -250,12 +256,15 @@ function renderItems(){
     const who = it.who.filter(id=>S.people.some(p=>p.id===id));
     const chips = S.people.map(p=>`<button type="button" class="chip" data-act="assign" data-item="${it.id}" data-p="${p.id}" aria-pressed="${who.includes(p.id)}">${esc(p.name)}</button>`).join('');
     return `<li class="item ${who.length?'':'unassigned'}" data-id="${it.id}">
-      <div class="itop"><input class="iname" data-f="name" value="${esc(it.name)}" aria-label="Item name" placeholder="Item">
+      <div class="itop"><textarea class="iname" data-f="name" rows="1" aria-label="Item name" placeholder="Item">${esc(it.name)}</textarea>
       <input class="price" data-f="price" inputmode="decimal" value="${(it.price/100).toFixed(2)}" aria-label="Price">
       <button type="button" class="del" data-act="del" data-item="${it.id}" aria-label="Delete ${esc(it.name)}">×</button></div>
       <div class="chips">${chips || '<span class="share-note">Add people above to assign this item.</span>'}${who.length>1?`<span class="share-note">shared ${who.length} ways</span>`:''}</div></li>`;
   }).join('') || '<li class="item status">No items yet.</li>';
 }
+function fitName(el){ el.style.height='auto'; el.style.height=Math.max(40, el.scrollHeight+2)+'px'; }
+function fitAllNames(){ document.querySelectorAll('textarea.iname').forEach(fitName); }
+window.addEventListener('resize', fitAllNames);
 function renderPeople(){
   $('people').innerHTML = S.people.map(p=>`<span class="person ${S.payer===p.id?'payer':''}">${esc(p.name)}
     <button type="button" class="star" data-act="payer" data-p="${p.id}" aria-pressed="${S.payer===p.id}" aria-label="${esc(p.name)} paid">★</button>
@@ -307,7 +316,7 @@ function renderTotals(){
   $('copy').textContent = nU ? `Assign ${nU} item${nU>1?'s':''} first` : 'Copy for group chat';
   $('sampleNote').hidden = !S.sample;
 }
-function renderAll(){ renderItems(); renderPeople(); renderSettings(); renderTotals(); save(); }
+function renderAll(){ renderItems(); fitAllNames(); renderPeople(); renderSettings(); renderTotals(); save(); }
 const touch = () => { if(S.sample){ S.sample=false; } };
 
 document.addEventListener('click', e=>{
@@ -318,13 +327,14 @@ document.addEventListener('click', e=>{
   if(act==='payer'){ S.payer = b.dataset.p; renderAll(); }
   if(act==='rmp'){ S.people = S.people.filter(p=>p.id!==b.dataset.p); if(S.payer===b.dataset.p) S.payer = S.people[0]?.id||null; renderAll(); }
 });
-function renderItemsKeepFocus(btn){ const sel=`[data-item="${btn.dataset.item}"][data-p="${btn.dataset.p}"]`; renderItems(); renderTotals(); save(); document.querySelector(sel)?.focus(); }
+function renderItemsKeepFocus(btn){ const sel=`[data-item="${btn.dataset.item}"][data-p="${btn.dataset.p}"]`; renderItems(); fitAllNames(); renderTotals(); save(); document.querySelector(sel)?.focus(); }
 $('items').addEventListener('input', e=>{
   const li=e.target.closest('.item'); const it=li && S.items.find(i=>i.id===li.dataset.id); if(!it) return; touch();
-  if(e.target.dataset.f==='name') it.name = e.target.value;
+  if(e.target.dataset.f==='name'){ if(/\n/.test(e.target.value)) e.target.value = e.target.value.replace(/\s*\n\s*/g,' '); it.name = e.target.value; fitName(e.target); }
   if(e.target.dataset.f==='price') it.price = toCents(e.target.value);
   renderTotals(); save();
 });
+$('items').addEventListener('keydown', e=>{ if(e.key==='Enter' && e.target.matches('textarea.iname')){ e.preventDefault(); e.target.blur(); } });
 $('items').addEventListener('change', e=>{ if(e.target.dataset.f==='price'){ const li=e.target.closest('.item'); const it=S.items.find(i=>i.id===li.dataset.id); e.target.value=(it.price/100).toFixed(2); } });
 $('addItem').addEventListener('click', ()=>{ touch(); const it={id:uid(),name:'',price:0,who:[]}; S.items.push(it); renderAll(); document.querySelector(`.item[data-id="${it.id}"] .iname`)?.focus(); });
 $('addPerson').addEventListener('submit', e=>{
