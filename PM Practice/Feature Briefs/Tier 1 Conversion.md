@@ -2,7 +2,7 @@
 
 Nov 26, 2026 · Kaitlin Mae Frani
 
-Five features from the Nov 26 UI/UX growth audit, aimed at getting a stranger from the shared link to a sent split in under 30 seconds. Status: prioritized Nov 26; A, B, C1, E and the Everyone chip are approved to build as one release.
+Five features from the Nov 26 UI/UX growth audit, aimed at getting a stranger from the shared link to a sent split in under 30 seconds. Status: shipped Nov 27 as v1.1 (A, B, C1, E, the Everyone chip and Penny); success check still to run.
 
 ## Problem and goal
 

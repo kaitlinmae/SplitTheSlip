@@ -8,6 +8,7 @@ Every release from the first build to v1.0, newest first. Testers should reload 
 
 | Version | Date | What changed |
 | --- | --- | --- |
+| 1.1 | Nov 27 | Tier 1 conversion release: first screen with Penny the mascot (sample dinner behind "See an example"), Everyone chip on each item, sticky who-owes-what bar with Send, send screen with Share to group chat, Copy text and an app-link switch, new message "🧾 The split is in!", Penny cheers when a scan matches the subtotal, link preview image and app icons |
 | 1.0 | Nov 26 | Long item names wrap and the box grows; breakdown prices stay on screen |
 | 0.15 | Nov 26 | Scanned tip keeps % or $ from the receipt; Even is the default and splits straight away; Proportional shows a note until items are assigned |
 | 0.14 | Nov 26 | Reads sideways and cluttered photos: crops to the paper, turns receipts upright, checks items against the subtotal, keeps fee lines, asks for tax when unreadable |

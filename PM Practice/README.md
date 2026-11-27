@@ -15,6 +15,6 @@ Product management docs for **Split the Slip**, kept through the build from firs
 
 **Feature Briefs** — proposals that are talked through and prioritized before building:
 
-- [Tier 1 Conversion](Feature%20Briefs/Tier%201%20Conversion.md): first screen, sticky totals bar, share and app link, payment requests, even split, link preview (prioritized; approved to build)
+- [Tier 1 Conversion](Feature%20Briefs/Tier%201%20Conversion.md): first screen, sticky totals bar, share and app link, payment requests, even split, link preview (shipped as v1.1)
 
 Copyright (c) 2026 Kaitlin Mae Frani. All rights reserved. See [LICENSE](../LICENSE).

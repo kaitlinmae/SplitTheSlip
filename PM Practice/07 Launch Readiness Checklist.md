@@ -29,7 +29,7 @@ v1.0 is live and ready for friends-and-family use; a wider public launch waits o
 
 ## Still to do before a wider launch
 
-- [ ] Ship the Tier 1 conversion work (first screen, sticky bar, share, even split, link preview)
+- [x] Shipped the Tier 1 conversion release as v1.1 (Nov 27)
 - [ ] Test scanning on at least 5 more real receipts from different restaurants
 - [ ] Test on an Android phone and in in-app browsers (Instagram, Messages)
 - [ ] Fix the two open low-severity issues (breakdown cents, screen reader labels)
