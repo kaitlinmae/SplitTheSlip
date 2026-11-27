@@ -2,12 +2,13 @@
 
 Nov 26, 2026 · Kaitlin Mae Frani
 
-34 product and technical decisions from the Nov 24 requirements session, the Nov 26 build and the Tier 1 feature brief, newest first, with the options weighed and the reason for each. Decision #28 reversed #6, and #29 confirmed it after the owner revisited the original reasoning.
+35 product and technical decisions from the Nov 24 requirements session, the Nov 26 build and the Tier 1 feature brief, newest first, with the options weighed and the reason for each. Decision #28 reversed #6, and #29 confirmed it after the owner revisited the original reasoning.
 
 ## Decisions
 
 | # | Date | Decision | Options considered | Why |
 | --- | --- | --- | --- | --- |
+| 35 | Nov 27 | New group-chat message: "🧾 The split is in! Kaitlin paid $124.02" (replaces #18) | "Paying Kaitlin back ($124.02 bill):"; "Bill split · $124.02 · Kaitlin paid"; "Send Kaitlin your share of the $124.02 bill:" | Warmer and more casual for group chats; doesn't name a meal, so it fits lunch, brunch or drinks |
 | 34 | Nov 26 | Ship the first screen, sticky totals bar, share sheet with app link, link preview and Everyone chip as one release | One feature at a time, in rank order | They work as a set, and with no analytics they can't be measured one at a time anyway |
 | 33 | Nov 26 | The sample dinner moves behind a "See an example" link | Keep opening with the sample; drop it entirely | New visitors get a clean start; the demo stays one tap away |
 | 32 | Nov 26 | Venmo and Cash App request buttons stay in v2 (reaffirms #2) | Build them in the Tier 1 release | Lowest confidence and most real-phone testing; wait until testers say repayment is the bigger pain |

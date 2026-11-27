@@ -25,7 +25,7 @@ Effort is a build estimate (S = under an hour, M = a few hours including testing
 | D | Split everything evenly | One button that assigns every item to everyone, plus an Everyone chip per item | Even splits take a tap per name per item | S | Pulls against the positioning "pay for what you ordered" |
 | E | Link preview and app icon | Preview image and description when the link is texted; home-screen icon | Shared links look bare; fewer friends tap through | S | Message apps cache old previews; needs a preview image file |
 
-The app link (C1) is on by default, per the owner's choice on Nov 26.
+The app link (C1) is on by default, per the owner's choice on Nov 26. On Nov 27 the message itself was changed to "🧾 The split is in! Kaitlin paid $124.02", followed by each person's amount (decision #35). Send opens a short screen to check the message before sharing, with Copy as a backup.
 
 ## Proposed prioritization
 
