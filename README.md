@@ -4,7 +4,7 @@ Snap the receipt, tap who had what, send the totals.
 
 Split the Slip is a free web app for splitting a restaurant bill with friends. It works on any phone or computer browser, with nothing to install and no account.
 
-**Use it here:** https://YOUR-GITHUB-USERNAME.github.io/split-the-slip/
+**Use it here:** https://kaitlinmae.github.io/SplitTheSlip/
 
 ## How it works
 
