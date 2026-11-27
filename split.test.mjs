@@ -251,18 +251,19 @@ test('parser: lone capital scraps are noise; real short names with a quantity st
   assert.deepEqual(r.items.map(i => i.name), ['1 IPA', 'Pho Ga']);
 });
 
-test('parser: tax from total minus subtotal fixes a misread digit or a missing tax line', () => {
+test('parser: tax from total minus subtotal fixes a misread digit or an unreadable tax label', () => {
   const misread = parseReceipt('1 Mala Lamb $22.00\n1 Bread $99.00\nSubtotal $121.00\nTax $10.51\nTotal $131.57');
   assert.equal(misread.tax, 10.57);
-  const missing = parseReceipt('1 Pizza $95.94\nSubtotal\n$95.94\nTotal $107.25 $16.77 $124.02');
-  assert.equal(missing.tax, 11.31);
+  const label = parseReceipt('1 Pizza $95.94\nSubtotal $95.94\n~ $11.31\nTotal $107.25');
+  assert.equal(label.tax, 11.31);
   const fine = parseReceipt('Burger 20.00\nSubtotal 20.00\nTax 1.80\nTotal 21.80');
   assert.equal(fine.tax, 1.8);
 });
 
 test('parser: a bare amount just above the subtotal counts as the bill total', () => {
   const r = parseReceipt('1 Pizza $95.94\nSubtotal $95.94\n$107.25\ny  or Tie Payment');
-  assert.equal(r.tax, 11.31);
+  assert.ok(r.totals.includes(107.25));
+  assert.equal(r.tax, 0);   // no tax line printed, so no guessing
   assert.equal(r.items.length, 1);
 });
 
@@ -289,4 +290,15 @@ test('parser: a garbled "Total" label never becomes an item', () => {
 test('parser: a food item whose price equals the items above it is still an item', () => {
   const r = parseReceipt('Fries 10.00\nSoda 10.00\nBig Platter 20.00\nSubtotal 40.00');
   assert.deepEqual(r.items.map(i => i.name), ['Fries', 'Soda', 'Big Platter']);
+});
+
+test('parser: no tax or tip listed means both stay 0, never guessed', () => {
+  const none = parseReceipt('Burger 20.00\nFries 5.00\nTotal 25.00');
+  assert.equal(none.tax, 0); assert.equal(none.tip, 0); assert.equal(none.tipPct, 0);
+  const gapOnly = parseReceipt('1 Pizza $95.94\nSubtotal $95.94\nTotal $107.25');
+  assert.equal(gapOnly.tax, 0);
+  const tipNotTax = parseReceipt('Burger 20.00\nSubtotal 20.00\nTip 4.00\nTotal 24.00');
+  assert.equal(tipNotTax.tax, 0); assert.equal(tipNotTax.tip, 4);
+  const taxListed = parseReceipt('Burger 20.00\nSubtotal 20.00\nSales Tax\nTotal 21.80');
+  assert.equal(taxListed.tax, 1.8);   // tax line printed but its amount unreadable
 });

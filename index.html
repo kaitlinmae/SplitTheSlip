@@ -331,7 +331,7 @@ const SAMPLE = () => {
           {id:uid(),name:'Wagyu don',price:2800,who:[j.id]},{id:uid(),name:'Edamame',price:650,who:[a.id,s.id,j.id]},
           {id:uid(),name:'Sake carafe',price:1800,who:[a.id,j.id]}]};
 };
-const BLANK = () => ({sample:false, people:[], payer:null, tax:0, tipPct:18, tipAmt:0, tipMode:'pct', taxSplit:'even', tipSplit:'even', items:[]});
+const BLANK = () => ({sample:false, people:[], payer:null, tax:0, tipPct:0, tipAmt:0, tipMode:'pct', taxSplit:'even', tipSplit:'even', items:[]});
 
 function normalize(s){
   if(!s || typeof s!=='object' || !Array.isArray(s.items)) return BLANK();
@@ -578,6 +578,7 @@ function looksLikeName(name){
 }
 function parseReceipt(text){
   const out={items:[], tax:0, tip:0, tipPct:0, total:0, totals:[], subtotal:0};
+  let taxSeen = false; const after = [];   // a tax label anywhere; amounts printed below the subtotal
   let pending = '';   // a name line whose price ended up on the next line
   let pastItems = false;   // below Subtotal only tax, totals and payment lines follow
   const PRICE = /(-)?\$?\s?([\dOoDQSsIl|iBZz]{1,4})\s?[.,]\s?([\dOoDQSsIl|iBZz]{2})(?![\d%])\s*(-)?/g;
@@ -586,10 +587,12 @@ function parseReceipt(text){
     // use the LAST price on the line; anything after it is usually tax flags or specks
     let m = null; for(const x of line.matchAll(PRICE)){ if(/\d/.test(x[2]) || x[0].includes('$')) m = x; }
     if(/sub\s*-?\s*total/i.test(line)) pastItems = true;
+    if(/\b(tax|hst|gst|pst|vat)\b/i.test(line)) taxSeen = true;
     if(!m){ const nm = cleanName(line); pending = looksLikeName(nm) && !/^\d+[\/:]/.test(line) ? nm : ''; continue; }
     const digits = fixDigits(m[2])+'.'+fixDigits(m[3]);
     if(!/^\d+\.\d\d$/.test(digits)) continue;
     let price = +digits; if(m[1]||m[4]) price = -price;
+    if(pastItems) after.push(Math.round(price*100));
     // an item line can also show a unit price before the line total ("2 Tacos 7.00 14.00")
     const rawName = line.slice(0,m.index).replace(/\s\$?\d{1,4}[.,]\d{2}\s*$/,'');
     // "Amount  Tip  Payment" row, e.g. "$107.25 $16.77 $124.02": tip = paid total − bill total
@@ -636,13 +639,15 @@ function parseReceipt(text){
     out.items.push({name:name.slice(0,60), price});
   }
   // Use the receipt's own maths: once the items match the printed subtotal, tax = bill total - subtotal.
-  // Fixes a misread tax digit (10.51 -> 10.57) and fills in a tax line that couldn't be read.
+  // Fixes a misread tax digit (10.51 -> 10.57) and a tax label that couldn't be read ("( $11.29").
+  // Never invents tax: the receipt must show a tax line, or a printed amount that is the difference.
   const sub = Math.round(out.subtotal*100), itemsSum = Math.round(out.items.reduce((a,i)=>a+i.price,0)*100);
   if(sub > 0 && Math.abs(itemsSum - sub) <= 1){
     const above = out.totals.map(t=>Math.round(t*100)).filter(t=>t > sub);
     if(above.length){
-      const d = Math.min(...above) - sub, tax = Math.round(out.tax*100);
-      if(d <= sub*0.2 && (tax === 0 || (Math.abs(tax - d) < 100 && tax !== d))) out.tax = d/100;
+      const d = Math.min(...above) - sub, tax = Math.round(out.tax*100), tip = Math.round(out.tip*100);
+      const printed = taxSeen || after.some(a => Math.abs(a - d) < 100);
+      if(printed && Math.abs(d - tip) > 1 && d <= sub*0.2 && (tax === 0 || (Math.abs(tax - d) < 100 && tax !== d))) out.tax = d/100;
     }
   }
   return out;
@@ -875,8 +880,8 @@ $('file').addEventListener('change', async e=>{
     } else {
       const keepPeople = S.sample ? [] : S.people;
       S = {...(S.sample?BLANK():S), sample:false, people:keepPeople, payer:keepPeople.some(p=>p.id===S.payer)?S.payer:(keepPeople[0]?.id||null), items};
-      if(taxC) S.tax = taxC;
-      if(tipPctR){ S.tipMode='pct'; S.tipPct=tipPctR; } else if(tipC){ S.tipMode='amt'; S.tipAmt=tipC; }
+      S.tax = taxC;   // not on the receipt -> $0, never a guess or a leftover
+      if(tipPctR){ S.tipMode='pct'; S.tipPct=tipPctR; S.tipAmt=0; } else if(tipC){ S.tipMode='amt'; S.tipAmt=tipC; S.tipPct=0; } else { S.tipMode='pct'; S.tipPct=0; S.tipAmt=0; }
     }
     renderAll();
     const tipNote = (choice!=='add' && tipPctR) ? ` Tip set to ${tipPctR}% from the receipt.` : tipC ? ` Tip set to ${money(tipC)} from the receipt.` : '';
@@ -885,13 +890,15 @@ $('file').addEventListener('change', async e=>{
     const totals = (Array.isArray(data.totals) && data.totals.length ? data.totals : [data.total]).map(t=>Math.round((+t||0)*100)).filter(t=>t>0);
     const tot = totals.find(t=>Math.abs(t-printed)<=1) || totals.find(t=>Math.abs(t-printed-tipC)<=1) || totals[0] || 0;
     const itemsSum = items.reduce((a,i)=>a+i.price,0), sub = Math.round((+data.subtotal||0)*100);
-    const noTax = taxC ? '' : ' Couldn’t read the tax, so enter it in Tax & tip.';
+    const above = totals.filter(t=>t>itemsSum+1), gap = above.length ? Math.min(...above) - itemsSum : 0;
+    const gapNote = !taxC && gap > 1 && Math.abs(gap - tipC) > 1 ? ` The receipt total is ${money(gap)} more than the items. If that’s tax, enter it in Tax & tip.` : '';
+    const noTax = taxC ? '' : ((tipC||tipPctR) ? ' No tax listed, so tax is $0.' : ' No tax or tip listed, so both are $0.') + gapNote;
     if(sub && Math.abs(sub-itemsSum)<=1){
       $('scanCheer').innerHTML = PENNY_CHEER + `<div><b>All ${items.length} item${items.length===1?'':'s'} found!</b><small>They match the receipt’s ${money(sub)} subtotal.</small></div>`;
       $('scanCheer').hidden = false;
       status((noTax + (usedOcr?' Check the names and prices.':'')).trim());
     }
-    else status(`Found ${items.length} item${items.length===1?'':'s'}.` + (tot && Math.abs(tot-printed)>1 ? ` Receipt total ${money(tot)} vs ${money(printed)} here — some items may be missing or misread.` : usedOcr ? ' Photo reading can slip up, so check each name and price.' : ' Check them against the receipt.'), !!(tot && Math.abs(tot-printed)>1));
+    else status(`Found ${items.length} item${items.length===1?'':'s'}.` + noTax + (tot && Math.abs(tot-printed)>1 ? ` Receipt total ${money(tot)} vs ${money(printed)} here — some items may be missing or misread.` : usedOcr ? ' Photo reading can slip up, so check each name and price.' : ' Check them against the receipt.'), !!(tot && Math.abs(tot-printed)>1));
     if(tipNote) $('scanStatus').textContent += tipNote;
   }catch(err){
     if(err && err.code==='rate_limited'){ status('Too many scans right now. Wait a minute and try again.', true); }
