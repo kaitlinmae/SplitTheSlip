@@ -2,7 +2,7 @@
 
 Nov 26, 2026 · Kaitlin Mae Frani
 
-Five features from the Nov 26 UI/UX growth audit, aimed at getting a stranger from the shared link to a sent split in under 30 seconds. Status: proposed, to be prioritized before any build.
+Five features from the Nov 26 UI/UX growth audit, aimed at getting a stranger from the shared link to a sent split in under 30 seconds. Status: prioritized Nov 26; A, B, C1, E and the Everyone chip are approved to build as one release.
 
 ## Problem and goal
 
@@ -50,10 +50,10 @@ Scoring uses RICE: Reach (1 to 10, relative share of users who meet the feature)
 
 ## Open questions
 
-- [ ] Do A, B, C1 and E ship together as one release, or one at a time?
-- [ ] D: whole-bill "Split everything evenly" button, the Everyone chip only, or neither?
-- [ ] C2: build Venmo and Cash App requests now, or keep them in v2 until testers say repayment is the bigger pain?
-- [ ] A: hide the sample dinner behind "See an example", or drop it entirely?
-- [ ] How will we judge success without analytics? (Proposed: time 3 friends from link to sent split, before and after.)
+- [x] Release: A, B, C1 and E ship together as one release
+- [x] D: the Everyone chip only; no whole-bill button
+- [x] C2: Venmo and Cash App requests stay in v2
+- [x] A: the sample dinner moves behind "See an example"
+- [ ] Success check: time 3 friends from link to sent split, before and after
 
-**Decision:** to be recorded here once prioritization is agreed.
+**Decision (Nov 26).** Build A (focused first screen, sample behind "See an example"), B (sticky who-owes-what bar), C1 (share sheet and app link, on by default), E (link preview and app icon) and the Everyone chip from D, as one release. The whole-bill even-split button is not built, keeping the "pay for what you ordered" angle (decision #11). Venmo and Cash App requests (C2) stay in v2 until testers say repayment is the bigger pain (decision #2). Recorded as decisions #31 to #34 in the [decision log](../04%20Decision%20Log.md).

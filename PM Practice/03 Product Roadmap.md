@@ -14,8 +14,8 @@ flowchart LR
         direction TB
         n1[Focused first screen]
         n2[Sticky who-owes-what bar]
-        n3[Share + Venmo / Cash App]
-        n4[Split everything evenly]
+        n3[Share sheet + app link]
+        n4[Everyone chip per item]
         n5[Link preview + app icon]
     end
     subgraph NEXT["Next · Tier 2: feel like a product"]
@@ -29,8 +29,8 @@ flowchart LR
     subgraph LATER["Later · Tier 3: measure and tidy"]
         direction TB
         l1[Privacy-friendly visit counts]
-        l2[Breakdown cents fix]
-        l3[Screen reader fixes]
+        l2[Venmo / Cash App requests]
+        l3[Breakdown cents, screen readers]
         l4["AI scanning upgrade (API)"]
         l5[Native app, if people return]
     end
@@ -38,7 +38,7 @@ flowchart LR
     NEXT -- "Gate 2: owner decides on visit counts" --> LATER
 ```
 
-Now is the current phase. Its five items work as a set, so they ship together before any Tier 2 work starts.
+Now is the current phase. Its five items were prioritized in the [Tier 1 feature brief](Feature%20Briefs/Tier%201%20Conversion.md) and ship together as one release (decision #34) before any Tier 2 work starts.
 
 ## Why each initiative
 
@@ -48,8 +48,8 @@ The growth audit found the product is strong but the first screen sells none of 
 | --- | --- | --- |
 | Focused first screen | Now | Sample dinner confuses new visitors; the main action is buried |
 | Sticky "who owes what" bar | Now | The payoff sits in the fourth card, after all the work |
-| Native share and Venmo / Cash App requests | Now | Copy, switch apps, paste loses people; payment links were the planned v2 answer to the repayment pain |
-| Split everything evenly, "Everyone" chip | Now | Even splits take a tap per name per item (revisits the Nov 24 call that left whole-bill even splits to the phone calculator) |
+| Share sheet and app link | Now | Copy, switch apps, paste loses people; the app link adds a growth loop |
+| "Everyone" chip per item (no whole-bill button, decision #31) | Now | Shared dishes take a tap per name |
 | Link preview and home-screen icon | Now | Shared links look bare, so fewer friends tap through |
 | One step at a time | Next | Four stacked cards feel like a form |
 | Scanning screen with a clear result | Next | A small grey status line doesn't build trust |
@@ -57,6 +57,7 @@ The growth audit found the product is strong but the first screen sells none of 
 | Icon and spacing polish | Next | Mixed symbols and four step colours look AI-made |
 | Assign by person | Next | Item-by-item tapping is slow for big groups |
 | Tester survey and in-app "Did these totals look right?" prompt | Next | The scan-accuracy, trust and retention targets can't be checked without them |
+| Venmo and Cash App requests | Later | The repayment pain; kept in v2 until testers say it's bigger than the maths (decision #32) |
 | Privacy-friendly visit counts | Later | No way to measure time to split or retention today |
 | Remaining review items (breakdown cents, screen readers) | Later | Low-severity polish from the release review |
 | AI scanning upgrade via an API | Later | Only if scan accuracy is the main tester complaint; costs per scan and needs a server |

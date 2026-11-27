@@ -2,12 +2,16 @@
 
 Nov 26, 2026 · Kaitlin Mae Frani
 
-30 product and technical decisions from the Nov 24 requirements session and the Nov 26 build, newest first, with the options weighed and the reason for each. Decision #28 reversed #6, and #29 confirmed it after the owner revisited the original reasoning.
+34 product and technical decisions from the Nov 24 requirements session, the Nov 26 build and the Tier 1 feature brief, newest first, with the options weighed and the reason for each. Decision #28 reversed #6, and #29 confirmed it after the owner revisited the original reasoning.
 
 ## Decisions
 
 | # | Date | Decision | Options considered | Why |
 | --- | --- | --- | --- | --- |
+| 34 | Nov 26 | Ship the first screen, sticky totals bar, share sheet with app link, link preview and Everyone chip as one release | One feature at a time, in rank order | They work as a set, and with no analytics they can't be measured one at a time anyway |
+| 33 | Nov 26 | The sample dinner moves behind a "See an example" link | Keep opening with the sample; drop it entirely | New visitors get a clean start; the demo stays one tap away |
+| 32 | Nov 26 | Venmo and Cash App request buttons stay in v2 (reaffirms #2) | Build them in the Tier 1 release | Lowest confidence and most real-phone testing; wait until testers say repayment is the bigger pain |
+| 31 | Nov 26 | Add an Everyone chip per item, but no whole-bill even-split button (reaffirms #11) | Chip and whole-bill button; neither | Speeds up shared dishes while keeping the "pay for what you ordered" angle |
 | 30 | Nov 26 | Keep the GitHub version as the only codebase; discard the v2 PWA zip | Merge the zip's offline mode, bundled scanner and home-screen icon into the GitHub version | The GitHub version has every fix since Nov 24; one codebase is simpler than merging two |
 | 29 | Nov 26 | Confirm Even as the default for both tax and tip, after revisiting #6 | Proportional for both (Nov 24); tax Proportional with tip Even | Most groups split evenly and it works the moment a receipt is scanned; Proportional stays one tap away for anyone who wants it |
 | 28 | Nov 26 | Even becomes the default split for tax and tip, applied straight away (reverses #6) | Keep Proportional default; tax Proportional with tip Even | Proportional showed $0.00 after a scan and read as broken; fairness to light orderers is now an open question |
