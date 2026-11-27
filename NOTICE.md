@@ -4,6 +4,10 @@
 Copyright (c) 2026 Kaitlin Mae Frani. All rights reserved.
 See [LICENSE](LICENSE) for the terms that apply to this app.
 
+## Original artwork
+
+Penny, the Split the Slip mascot, and the app icons are original artwork owned by Kaitlin Mae Frani and covered by this app's LICENSE.
+
 ## Third-party components
 
 Split the Slip loads the components below from public CDNs when it runs. They are **not** copied into this repository. They belong to their own authors and are covered by their own licenses, not by this app's LICENSE.

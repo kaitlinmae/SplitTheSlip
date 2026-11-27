@@ -11,7 +11,23 @@
 <meta name="author" content="Kaitlin Mae Frani">
 <meta name="copyright" content="© 2026 Kaitlin Mae Frani. All rights reserved.">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Split the Slip</title>
+<title>Split the Slip · Split any bill in 30 seconds</title>
+<meta name="description" content="Snap the receipt, tap who had what, send everyone their total. Free, no sign-up, and your photo never leaves your phone.">
+<meta name="theme-color" content="#7b5ccc">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Split the Slip">
+<meta property="og:title" content="Split the Slip · Split any bill in 30 seconds">
+<meta property="og:description" content="Free · no sign-up · your photo never leaves your phone">
+<meta property="og:url" content="https://kaitlinmae.github.io/SplitTheSlip/">
+<meta property="og:image" content="https://kaitlinmae.github.io/SplitTheSlip/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Penny, the Split the Slip mascot, holding a receipt">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="apple-mobile-web-app-title" content="Split Slip">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="manifest" href="manifest.webmanifest">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet">
 <style>
@@ -124,21 +140,74 @@ label.linkbtn{display:inline-flex;align-items:center;font-size:14px}
 .undo{display:flex;align-items:center;gap:10px;font-size:14px;margin:0 4px 12px}
 .linkbtn{border:0;background:transparent;color:var(--accent-text);font-weight:600;text-decoration:underline;cursor:pointer;min-height:36px;padding:0 4px}
 .foot{text-align:center;font-size:12.5px;color:var(--quiet);margin:28px 0 0}
+[hidden]{display:none!important}
+.vh{position:absolute;width:1px;height:1px;opacity:0;pointer-events:none}
+.welcome{min-height:100vh;min-height:100dvh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px 20px 24px;box-sizing:border-box;text-align:center}
+.welcome[hidden],.owebar[hidden],.sheet-back[hidden],.cheer[hidden]{display:none}
+.w-inner{max-width:360px;width:100%;display:flex;flex-direction:column;align-items:center;gap:10px;margin:auto 0}
+.w-brand{margin:6px 0 0;color:var(--accent-text);font-weight:600;font-size:14px}
+.w-title{font-size:34px;line-height:1.12;margin:0;letter-spacing:-.02em;font-weight:600}
+.w-sub{margin:0 0 10px;color:var(--quiet);font-size:15px}
+.w-scan{width:100%;justify-content:center;min-height:54px;font-size:17px;gap:8px}
+.w-trust{margin:12px 0 0;color:var(--quiet);font-size:13px}
+.linkbtn.quiet{color:var(--quiet);font-weight:500}
+.everyone{border:1.5px dashed var(--accent)!important;background:transparent!important;color:var(--accent-text)!important}
+.everyone[aria-pressed=true]{background:var(--accent-text)!important;border-style:solid!important;color:var(--chip-on-ink)!important}
+body.has-bar .wrap{padding-bottom:132px}
+.owebar{position:fixed;left:0;right:0;bottom:0;z-index:20;background:var(--paper);border-top:1px solid var(--rule);box-shadow:0 -8px 24px -18px rgba(60,50,90,.35);padding:10px 16px calc(10px + env(safe-area-inset-bottom))}
+.owebar-in{max-width:520px;margin:0 auto;display:flex;align-items:center;gap:12px}
+.owe-txt{flex:1;min-width:0}
+.owe-txt b{display:block;font-weight:600;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-variant-numeric:tabular-nums}
+.owe-txt small{display:block;color:var(--quiet);font-size:12.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.owebar .btn{flex:none}
+.btn:disabled,.btn[aria-disabled=true]{opacity:1;background:var(--chip);color:var(--quiet);cursor:default}
+.sheet-back{position:fixed;inset:0;z-index:30;background:rgba(40,34,58,.42);display:flex;align-items:flex-end;justify-content:center}
+.sheet{position:relative;background:var(--paper);width:100%;max-width:520px;border-radius:22px 22px 0 0;padding:18px 18px calc(18px + env(safe-area-inset-bottom));box-sizing:border-box}
+.sheet h2{margin:0;font-size:18px}
+.sheet .penny{position:absolute;right:56px;top:-46px}
+.sheet .btn.wide{width:100%;justify-content:center;margin-top:10px}
+.msg{white-space:pre-wrap;word-break:break-word;background:var(--chip);border-radius:14px;padding:12px 14px;font:14px/1.5 "DM Sans",system-ui,sans-serif;margin:14px 0 4px}
+.msg .lnk{color:var(--quiet)}
+.toggle{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:14px;padding-top:12px;border-top:1px solid var(--rule);font-size:14px;color:var(--quiet);cursor:pointer}
+.toggle input{position:absolute;opacity:0;width:1px;height:1px}
+.toggle .sw{width:42px;height:24px;border-radius:999px;background:var(--rule);position:relative;flex:none;transition:background .15s}
+.toggle .sw::after{content:"";position:absolute;left:3px;top:3px;width:18px;height:18px;border-radius:50%;background:#fff;box-shadow:0 1px 2px rgba(0,0,0,.2);transition:transform .15s}
+.toggle input:checked+.sw{background:var(--accent-text)}
+.toggle input:checked+.sw::after{transform:translateX(18px)}
+.toggle input:focus-visible+.sw{outline:2px solid var(--accent-text);outline-offset:2px}
+.cheer{display:flex;align-items:center;gap:12px;background:var(--mint);border-radius:16px;padding:10px 14px;margin:0 0 12px}
+.cheer b{display:block;color:var(--good);font-weight:600}
+.cheer small{display:block;color:var(--ink);font-size:13px}
+@media(prefers-reduced-motion:no-preference){.sheet-back:not([hidden]) .sheet{animation:up .22s ease-out}@keyframes up{from{transform:translateY(24px);opacity:.6}}.cheer:not([hidden]) .penny{animation:hop .5s ease-out}@keyframes hop{30%{transform:translateY(-6px)}}}
 textarea.fallback{width:100%;min-height:120px;margin-top:8px;font:13px "IBM Plex Mono",monospace}
 @media(max-width:420px){h1{font-size:26px}.itop{grid-template-columns:minmax(0,1fr) 84px 32px}}
 @media(prefers-reduced-motion:no-preference){.stub[open] .brk{animation:drop .2s ease-out}@keyframes drop{from{opacity:0;transform:translateY(-4px)}}}
 </style>
 </head>
 <body>
-<div class="wrap">
+<input type="file" id="file" class="vh" accept="image/*" tabindex="-1" aria-hidden="true">
+<main class="welcome" id="welcome" hidden>
+ <div class="w-inner">
+  <svg class="penny" viewBox="100 88 180 228" width="132" height="168" aria-hidden="true" focusable="false"><path d="M190 118 q-2 -16 10 -24 q4 14 -10 24z" fill="#9fd8b8" stroke="#5b45a8" stroke-width="2" stroke-linejoin="round"/><path d="M190 120 v8" stroke="#5b45a8" stroke-width="2" stroke-linecap="round"/><ellipse cx="160" cy="300" rx="20" ry="9" fill="#b9a6ee" stroke="#5b45a8" stroke-width="2"/><ellipse cx="220" cy="300" rx="20" ry="9" fill="#b9a6ee" stroke="#5b45a8" stroke-width="2"/><ellipse cx="190" cy="212" rx="82" ry="88" fill="#cdbdf3" stroke="#5b45a8" stroke-width="2"/><circle cx="165" cy="186" r="5.5" fill="#2e2547"/><circle cx="215" cy="186" r="5.5" fill="#2e2547"/><circle cx="167" cy="184" r="1.6" fill="#fff"/><circle cx="217" cy="184" r="1.6" fill="#fff"/><path d="M179 204 q11 10 22 0" fill="none" stroke="#2e2547" stroke-width="2.5" stroke-linecap="round"/><ellipse cx="150" cy="204" rx="10" ry="5.5" fill="#f4a9bf" opacity="0.75"/><ellipse cx="230" cy="204" rx="10" ry="5.5" fill="#f4a9bf" opacity="0.75"/><path d="M156 226 h68 v66 l-8.5 -7 l-8.5 7 l-8.5 -7 l-8.5 7 l-8.5 -7 l-8.5 7 l-8.5 -7 l-8.5 7z" fill="#fff" stroke="#5b45a8" stroke-width="2" stroke-linejoin="round"/><rect x="166" y="238" width="30" height="4" rx="2" fill="#d9cff5"/><rect x="204" y="238" width="10" height="4" rx="2" fill="#d9cff5"/><rect x="166" y="250" width="24" height="4" rx="2" fill="#d9cff5"/><rect x="204" y="250" width="10" height="4" rx="2" fill="#d9cff5"/><rect x="166" y="262" width="48" height="2" rx="1" fill="#b9a6ee"/><path d="M183 273 l5 5 l10 -10" fill="none" stroke="#3f8f66" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="154" cy="252" r="13" fill="#cdbdf3" stroke="#5b45a8" stroke-width="2"/><circle cx="226" cy="252" r="13" fill="#cdbdf3" stroke="#5b45a8" stroke-width="2"/></svg>
+  <p class="w-brand">Split the Slip</p>
+  <h1 class="w-title">Split any bill<br>in 30 seconds</h1>
+  <p class="w-sub">Snap the receipt, tap who had what, send everyone their total.</p>
+  <label class="btn primary w-scan scanbtn" for="file" role="button" tabindex="0"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1z"/><circle cx="12" cy="13" r="3.5"/></svg>Scan your receipt</label>
+  <button type="button" class="linkbtn" id="wType">or type it in</button>
+  <p class="w-trust">Free · No sign-up · Your photo never leaves your phone</p>
+  <button type="button" class="linkbtn quiet" id="wExample">See an example</button>
+ </div>
+ <footer class="foot">© 2026 Kaitlin Mae Frani. All rights reserved.</footer>
+</main>
+<div class="wrap" id="app">
  <header>
   <div><h1>Split the <span>Slip</span></h1><p class="sub">Snap the receipt, tap who had what, send the totals.</p></div>
  </header>
  <div class="topbar">
   <label class="btn primary scanbtn" id="uploadBtn" for="file" role="button" tabindex="0">Scan receipt photo</label>
   <button class="btn small" id="reset" type="button">New bill</button>
-  <input type="file" id="file" class="vh" accept="image/*" tabindex="-1" aria-hidden="true">
  </div>
+ <div class="cheer" id="scanCheer" role="status" hidden></div>
  <p class="status topstatus" id="scanStatus" aria-live="polite"></p>
  <div class="choice" id="scanChoice" role="group" aria-label="Add or replace scanned items" hidden></div>
  <p class="undo" id="undoBar" role="status" hidden><span id="undoMsg">Bill cleared.</span> <button type="button" class="linkbtn" id="undoBtn">Undo</button></p>
@@ -177,11 +246,25 @@ textarea.fallback{width:100%;min-height:120px;margin-top:8px;font:13px "IBM Plex
   <h2 id="h-res"><span class="n">4</span>Who owes what</h2>
   <p class="hint">Tap a name to see the math.</p>
   <div class="results" id="results"></div>
-  <div class="summary" id="summary"></div>
-  <div class="row"><button class="btn primary" id="copy" type="button">Copy for group chat</button><span class="copied" id="copied" aria-live="polite"></span></div>
-  <div id="fallbackBox"></div>
+  <div class="row" style="margin-top:14px"><button class="btn primary" id="openSend" type="button">Send the split</button></div>
  </section>
  <footer class="foot">© 2026 Kaitlin Mae Frani. All rights reserved.</footer>
+</div>
+<div class="owebar" id="owebar" hidden><div class="owebar-in">
+ <div class="owe-txt" aria-live="polite"><b id="oweMain"></b><small id="oweSub"></small></div>
+ <button class="btn primary small" id="barSend" type="button">Send</button>
+</div></div>
+<div class="sheet-back" id="sendSheet" hidden>
+ <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="sendTitle">
+  <svg class="penny" viewBox="100 88 180 228" width="58" height="74" aria-hidden="true" focusable="false"><path d="M190 118 q-2 -16 10 -24 q4 14 -10 24z" fill="#9fd8b8" stroke="#5b45a8" stroke-width="2" stroke-linejoin="round"/><path d="M190 120 v8" stroke="#5b45a8" stroke-width="2" stroke-linecap="round"/><ellipse cx="160" cy="300" rx="20" ry="9" fill="#b9a6ee" stroke="#5b45a8" stroke-width="2"/><ellipse cx="220" cy="300" rx="20" ry="9" fill="#b9a6ee" stroke="#5b45a8" stroke-width="2"/><ellipse cx="190" cy="212" rx="82" ry="88" fill="#cdbdf3" stroke="#5b45a8" stroke-width="2"/><circle cx="165" cy="186" r="5.5" fill="#2e2547"/><circle cx="215" cy="186" r="5.5" fill="#2e2547"/><circle cx="167" cy="184" r="1.6" fill="#fff"/><circle cx="217" cy="184" r="1.6" fill="#fff"/><path d="M179 204 q11 10 22 0" fill="none" stroke="#2e2547" stroke-width="2.5" stroke-linecap="round"/><ellipse cx="150" cy="204" rx="10" ry="5.5" fill="#f4a9bf" opacity="0.75"/><ellipse cx="230" cy="204" rx="10" ry="5.5" fill="#f4a9bf" opacity="0.75"/><circle cx="270" cy="140" r="13" fill="#cdbdf3" stroke="#5b45a8" stroke-width="2"/><circle cx="118" cy="250" r="13" fill="#cdbdf3" stroke="#5b45a8" stroke-width="2"/></svg>
+  <div class="row" style="justify-content:space-between"><h2 id="sendTitle">Send the split</h2><button type="button" class="del" id="closeSend" aria-label="Close">×</button></div>
+  <div class="msg" id="msgPreview"></div>
+  <button class="btn primary wide" id="shareBtn" type="button">Share to group chat</button>
+  <button class="btn wide" id="copyBtn" type="button">Copy text</button>
+  <p class="copied" id="copied" aria-live="polite" style="margin:8px 0 0;text-align:center"></p>
+  <div id="fallbackBox"></div>
+  <label class="toggle"><span>Add app link</span><input type="checkbox" id="appLink"><span class="sw" aria-hidden="true"></span></label>
+ </div>
 </div>
 <script>
 {
@@ -237,7 +320,7 @@ const SAMPLE = () => {
 const BLANK = () => ({sample:false, people:[], payer:null, tax:0, tipPct:18, tipAmt:0, tipMode:'pct', taxSplit:'even', tipSplit:'even', items:[]});
 
 function normalize(s){
-  if(!s || typeof s!=='object' || !Array.isArray(s.items)) return SAMPLE();
+  if(!s || typeof s!=='object' || !Array.isArray(s.items)) return BLANK();
   const b = BLANK(); s = {...b, ...s};
   s.people = (Array.isArray(s.people)?s.people:[]).filter(p=>p && typeof p.id==='string' && typeof p.name==='string');
   s.items = s.items.filter(i=>i && typeof i.id==='string').map(i=>({id:i.id, name:typeof i.name==='string'?i.name:'', price:Number.isFinite(i.price)?Math.round(i.price):0, who:Array.isArray(i.who)?i.who.filter(x=>typeof x==='string'):[]}));
@@ -248,13 +331,19 @@ function normalize(s){
   if(!s.people.some(p=>p.id===s.payer)) s.payer = s.people[0]?.id || null;
   return s;
 }
-let S, loadFailed = false; try{ S = normalize(JSON.parse(localStorage.getItem('splitslip'))) }catch(e){ S = SAMPLE(); }
+let S, loadFailed = false; try{ S = normalize(JSON.parse(localStorage.getItem('splitslip'))) }catch(e){ S = BLANK(); }
+// A visitor with no bill of their own (nothing saved, an empty bill, or only the sample) sees the first screen.
+const isFresh = s => !!s.sample || (!s.items.length && !s.people.length);
+const APP_URL = 'https://kaitlinmae.github.io/SplitTheSlip';
+let appLinkOn = true; try{ appLinkOn = localStorage.getItem('splitslip_applink') !== '0'; }catch(e){}
 const save = () => { try{ localStorage.setItem('splitslip', JSON.stringify(S)) }catch(e){} };
 
 function renderItems(){
   $('items').innerHTML = S.items.map(it=>{
     const who = it.who.filter(id=>S.people.some(p=>p.id===id));
-    const chips = S.people.map(p=>`<button type="button" class="chip" data-act="assign" data-item="${it.id}" data-p="${p.id}" aria-pressed="${who.includes(p.id)}">${esc(p.name)}</button>`).join('');
+    const all = S.people.length>1 && S.people.every(p=>who.includes(p.id));
+    const chips = S.people.map(p=>`<button type="button" class="chip" data-act="assign" data-item="${it.id}" data-p="${p.id}" aria-pressed="${who.includes(p.id)}">${esc(p.name)}</button>`).join('')
+      + (S.people.length>1 ? `<button type="button" class="chip everyone" data-act="everyone" data-item="${it.id}" aria-pressed="${all}" aria-label="Everyone had ${esc(it.name||'this item')}">Everyone</button>` : '');
     return `<li class="item ${who.length?'':'unassigned'}" data-id="${it.id}">
       <div class="itop"><textarea class="iname" data-f="name" rows="1" aria-label="Item name" placeholder="Item">${esc(it.name)}</textarea>
       <input class="price" data-f="price" inputmode="decimal" value="${(it.price/100).toFixed(2)}" aria-label="Price">
@@ -276,6 +365,20 @@ function renderSettings(){
   if(document.activeElement!==$('tip')) $('tip').value = S.tipMode==='pct' ? (S.tipPct||'') : (S.tipAmt ? (S.tipAmt/100).toFixed(2) : '');
 }
 let lastSummary = '';
+const short = c => c%100===0 ? '$'+(c/100) : money(c);
+function buildMessage(r, payer, owing){
+  const head = payer ? `🧾 The split is in! ${payer.name} paid ${short(r.grand)}` : `🧾 The split is in! ${short(r.grand)} total`;
+  return [head,
+    ...(payer ? owing : r.rows).map(x=>`${x.name}: ${short(x.total)}`),
+    ...(r.unassigned.length?[`(${r.unassigned.length} item${r.unassigned.length>1?'s':''} unassigned)`]:[]),
+    ...(appLinkOn?[`Split with Split the Slip → ${APP_URL}`]:[])
+  ].join('\n');
+}
+function renderPreview(){
+  const el = $('msgPreview'); if(!el) return;
+  const lines = lastSummary.split('\n');
+  el.innerHTML = lines.map(l => l.startsWith('Split with Split the Slip') ? `<span class="lnk">${esc(l)}</span>` : esc(l)).join('\n');
+}
 function renderTotals(){
   const r = compute(S);
   $('subtotal').textContent = money(r.fullSub);
@@ -296,24 +399,27 @@ function renderTotals(){
       <div class="tot"><span>Total</span><span class="price">${money(x.total)}</span></div></div></details>`;
   }).join('') || '<p class="status">Add people to see the split.</p>';
   const owing = r.rows.filter(x=>x.id!==S.payer);
-  const short = c => c%100===0 ? '$'+(c/100) : money(c);
-  lastSummary = r.rows.length ? [
-    `food tab, ${short(r.grand)} total${payer?` paid by ${payer.name}`:''}:`,
-    ...owing.map(x=> `${x.name}: ${short(x.total)}`),
-    ...(r.unassigned.length?[`(${r.unassigned.length} item${r.unassigned.length>1?'s':''} unassigned)`]:[])
-  ].join('\n') : '';
-  const sumEl = $('summary'), newText = lastSummary || 'The summary appears here.';
-  if(sumEl.textContent !== newText){
-    const had = sumEl.textContent !== '';
-    sumEl.textContent = newText;
-    if(had){ sumEl.classList.remove('flash'); void sumEl.offsetWidth; sumEl.classList.add('flash'); }
+  const nU = r.unassigned.length;
+  const newSummary = r.rows.length ? buildMessage(r, payer, owing) : '';
+  if(newSummary !== lastSummary){
+    lastSummary = newSummary;
     $('copied').textContent = '';
     const fb = document.querySelector('#fallbackBox textarea'); if(fb) fb.value = lastSummary;
+    renderPreview();
   }
-  const nU = r.unassigned.length;
   $('propNote').hidden = !(nU && S.people.length && ((S.taxSplit==='prop' && S.tax) || (S.tipSplit==='prop' && r.tip)));
-  $('copy').disabled = !lastSummary || nU>0;
-  $('copy').textContent = nU ? `Assign ${nU} item${nU>1?'s':''} first` : 'Copy for group chat';
+  const canSend = !!lastSummary && !nU && owing.length > 0;
+  const waitLabel = nU ? `Assign ${nU} item${nU>1?'s':''} first` : '';
+  $('openSend').disabled = !canSend; $('openSend').textContent = waitLabel || 'Send the split';
+  $('barSend').disabled = !canSend; $('barSend').textContent = waitLabel || 'Send';
+  // sticky who-owes-what bar
+  const showBar = $('welcome').hidden && S.people.length > 0 && S.items.length > 0;
+  $('owebar').hidden = !showBar; document.body.classList.toggle('has-bar', showBar);
+  if(showBar){
+    const shown = payer ? owing : r.rows;
+    $('oweMain').textContent = shown.length ? shown.map(x=>`${x.name} ${money(x.total)}`).join(' · ') : 'Add someone to split with';
+    $('oweSub').textContent = nU ? `${nU} item${nU>1?'s':''} not assigned yet` : payer ? `${payer.name} paid · updates as you tap` : 'Tap ★ to mark who paid';
+  }
   $('sampleNote').hidden = !S.sample;
 }
 function renderAll(){ renderItems(); fitAllNames(); renderPeople(); renderSettings(); renderTotals(); save(); }
@@ -323,6 +429,8 @@ document.addEventListener('click', e=>{
   const b = e.target.closest('[data-act]'); if(!b) return;
   const act=b.dataset.act; touch();
   if(act==='assign'){ const it=S.items.find(i=>i.id===b.dataset.item); const p=b.dataset.p; it.who = it.who.includes(p)? it.who.filter(x=>x!==p) : [...it.who,p]; b.setAttribute('aria-pressed', it.who.includes(p)); renderItemsKeepFocus(b); }
+  if(act==='everyone'){ const it=S.items.find(i=>i.id===b.dataset.item); const all=S.people.every(p=>it.who.includes(p.id)); it.who = all ? [] : S.people.map(p=>p.id);
+    renderItems(); fitAllNames(); renderTotals(); save(); document.querySelector(`[data-act="everyone"][data-item="${it.id}"]`)?.focus(); }
   if(act==='del'){ S.items = S.items.filter(i=>i.id!==b.dataset.item); renderAll(); }
   if(act==='payer'){ S.payer = b.dataset.p; renderAll(); }
   if(act==='rmp'){ S.people = S.people.filter(p=>p.id!==b.dataset.p); if(S.payer===b.dataset.p) S.payer = S.people[0]?.id||null; renderAll(); }
@@ -353,16 +461,44 @@ function showUndo(msg, prev){
 }
 $('reset').addEventListener('click', ()=>{
   const prev = S.sample ? null : JSON.stringify(S);
-  S = BLANK(); status(''); $('scanChoice').hidden=true; $('fallbackBox').innerHTML=''; renderAll();
+  S = BLANK(); status(''); $('scanCheer').hidden=true; $('scanChoice').hidden=true; $('fallbackBox').innerHTML=''; renderAll();
   if(prev) showUndo('Bill cleared.', prev);
 });
 document.querySelectorAll('.scanbtn').forEach(b=>b.addEventListener('keydown', e=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); if(!scanning) $('file').click(); } }));
 
-$('copy').addEventListener('click', async ()=>{
+// ---- first screen ----
+function showWelcome(){ $('welcome').hidden=false; $('app').hidden=true; $('owebar').hidden=true; document.body.classList.remove('has-bar'); }
+function hideWelcome(){ if($('welcome').hidden) return; $('welcome').hidden=true; $('app').hidden=false; renderAll(); window.scrollTo(0,0); }
+$('wType').addEventListener('click', ()=>{ S = BLANK(); hideWelcome(); $('personName').focus(); });
+$('wExample').addEventListener('click', ()=>{ S = SAMPLE(); hideWelcome(); });
+
+// ---- send sheet ----
+let lastFocus = null;
+async function copyMessage(){
   $('copied').textContent=''; $('fallbackBox').innerHTML='';
   try{ await navigator.clipboard.writeText(lastSummary); $('copied').textContent='Copied! Paste it in your group chat.'; }
-  catch(e){ const t=document.createElement('textarea'); t.className='fallback'; t.value=lastSummary; t.setAttribute('aria-label','Summary to copy'); $('fallbackBox').appendChild(t); t.select(); $('copied').textContent='Select and copy the text below.'; }
+  catch(e){ const t=document.createElement('textarea'); t.className='fallback'; t.value=lastSummary; t.setAttribute('aria-label','Message to copy'); $('fallbackBox').appendChild(t); t.select(); $('copied').textContent='Select and copy the text below.'; }
+}
+function openSheet(){
+  if(!lastSummary) return;
+  lastFocus = document.activeElement; $('copied').textContent=''; $('fallbackBox').innerHTML='';
+  $('appLink').checked = appLinkOn; renderPreview();
+  $('shareBtn').hidden = !navigator.share;
+  $('copyBtn').classList.toggle('primary', !navigator.share);
+  $('sendSheet').hidden = false; ($('shareBtn').hidden ? $('copyBtn') : $('shareBtn')).focus();
+}
+function closeSheet(){ $('sendSheet').hidden = true; lastFocus?.focus?.(); }
+$('barSend').addEventListener('click', openSheet);
+$('openSend').addEventListener('click', openSheet);
+$('closeSend').addEventListener('click', closeSheet);
+$('sendSheet').addEventListener('click', e=>{ if(e.target===$('sendSheet')) closeSheet(); });
+document.addEventListener('keydown', e=>{ if(e.key==='Escape' && !$('sendSheet').hidden) closeSheet(); });
+$('copyBtn').addEventListener('click', copyMessage);
+$('shareBtn').addEventListener('click', async ()=>{
+  try{ await navigator.share({text: lastSummary}); }
+  catch(e){ if(!e || e.name!=='AbortError') copyMessage(); }
 });
+$('appLink').addEventListener('change', e=>{ appLinkOn = e.target.checked; try{ localStorage.setItem('splitslip_applink', appLinkOn?'1':'0'); }catch(_){} renderTotals(); renderPreview(); });
 
 // ---- receipt scanning: Claude when available, otherwise free on-device reader (Tesseract.js) ----
 let sampleFn = null, scanMode = null, scanning = false; // 'claude' | 'ocr'
@@ -641,6 +777,7 @@ function askAddOrReplace(nFound, nHave){
     c.onclick = e=>{ const b=e.target.closest('[data-c]'); if(!b) return; c.hidden=true; c.innerHTML=''; c.onclick=null; res(b.dataset.c); };
   });
 }
+const PENNY_CHEER = '<svg class="penny" viewBox="100 88 180 228" width="52" height="66" aria-hidden="true" focusable="false"><path d="M190 118 q-2 -16 10 -24 q4 14 -10 24z" fill="#9fd8b8" stroke="#5b45a8" stroke-width="2" stroke-linejoin="round"/><path d="M190 120 v8" stroke="#5b45a8" stroke-width="2" stroke-linecap="round"/><ellipse cx="160" cy="300" rx="20" ry="9" fill="#b9a6ee" stroke="#5b45a8" stroke-width="2"/><ellipse cx="220" cy="300" rx="20" ry="9" fill="#b9a6ee" stroke="#5b45a8" stroke-width="2"/><ellipse cx="190" cy="212" rx="82" ry="88" fill="#cdbdf3" stroke="#5b45a8" stroke-width="2"/><path d="M160 188 q5 -7 10 0" fill="none" stroke="#2e2547" stroke-width="3" stroke-linecap="round"/><path d="M210 188 q5 -7 10 0" fill="none" stroke="#2e2547" stroke-width="3" stroke-linecap="round"/><path d="M176 204 q14 16 28 0z" fill="#fff" stroke="#2e2547" stroke-width="2.5" stroke-linejoin="round"/><ellipse cx="150" cy="204" rx="10" ry="5.5" fill="#f4a9bf" opacity="0.75"/><ellipse cx="230" cy="204" rx="10" ry="5.5" fill="#f4a9bf" opacity="0.75"/><circle cx="112" cy="150" r="13" fill="#cdbdf3" stroke="#5b45a8" stroke-width="2"/><circle cx="268" cy="150" r="13" fill="#cdbdf3" stroke="#5b45a8" stroke-width="2"/></svg>';
 const PROMPT = `You read restaurant receipts. Extract every ordered line item from the attached receipt photo.
 Return ONLY JSON, no prose, in this shape:
 {"items":[{"name":"string","price":12.50}],"tax":1.23,"tip":0,"tipPct":0,"total":45.67}
@@ -649,8 +786,9 @@ Discounts are items with negative prices. Do not include subtotal, tax, tip, gra
 tip is the tip or gratuity amount actually charged; tipPct is its percentage only if the receipt prints one (ignore suggested-tip tables). If tax, tip, or total is not printed, use 0. If the image is not a receipt, return {"items":[]}.`;
 $('file').addEventListener('change', async e=>{
   const f=e.target.files[0]; e.target.value=''; if(!f || scanning) return;
+  hideWelcome();
   if(!scanMode){ status('Getting the scanner ready. Try again in a moment.'); return; }
-  const btns=document.querySelectorAll('.scanbtn'); scanning=true; $('file').disabled=true; btns.forEach(b=>{ b.style.pointerEvents='none'; b.setAttribute('aria-disabled','true'); }); $('scanChoice').hidden=true; status('Reading receipt…');
+  const btns=document.querySelectorAll('.scanbtn'); scanning=true; $('file').disabled=true; btns.forEach(b=>{ b.style.pointerEvents='none'; b.setAttribute('aria-disabled','true'); }); $('scanChoice').hidden=true; $('scanCheer').hidden=true; status('Reading receipt…');
   try{
     const blob = await shrink(f);
     let data, usedOcr = scanMode==='ocr';
@@ -685,7 +823,11 @@ $('file').addEventListener('change', async e=>{
     const tot = totals.find(t=>Math.abs(t-printed)<=1) || totals.find(t=>Math.abs(t-printed-tipC)<=1) || totals[0] || 0;
     const itemsSum = items.reduce((a,i)=>a+i.price,0), sub = Math.round((+data.subtotal||0)*100);
     const noTax = taxC ? '' : ' Couldn’t read the tax, so enter it in Tax & tip.';
-    if(sub && Math.abs(sub-itemsSum)<=1){ status(`Found ${items.length} item${items.length===1?'':'s'}. They add up to the receipt’s subtotal (${money(sub)}).`+noTax+(usedOcr?' Check the names and prices.':'')); }
+    if(sub && Math.abs(sub-itemsSum)<=1){
+      $('scanCheer').innerHTML = PENNY_CHEER + `<div><b>All ${items.length} item${items.length===1?'':'s'} found!</b><small>They match the receipt’s ${money(sub)} subtotal.</small></div>`;
+      $('scanCheer').hidden = false;
+      status((noTax + (usedOcr?' Check the names and prices.':'')).trim());
+    }
     else status(`Found ${items.length} item${items.length===1?'':'s'}.` + (tot && Math.abs(tot-printed)>1 ? ` Receipt total ${money(tot)} vs ${money(printed)} here — some items may be missing or misread.` : usedOcr ? ' Photo reading can slip up, so check each name and price.' : ' Check them against the receipt.'), !!(tot && Math.abs(tot-printed)>1));
     if(tipNote) $('scanStatus').textContent += tipNote;
   }catch(err){
@@ -694,6 +836,7 @@ $('file').addEventListener('change', async e=>{
   }finally{ scanning=false; $('file').disabled=false; btns.forEach(b=>{ b.style.pointerEvents=''; b.removeAttribute('aria-disabled'); }); }
 });
 
+if(isFresh(S)){ if(S.sample) S = BLANK(); showWelcome(); }
 try{ renderAll(); }catch(e){ loadFailed = true; S = BLANK(); renderAll(); status('Couldn’t load your last bill, so this is a fresh one.', true); }
 }
 </script>

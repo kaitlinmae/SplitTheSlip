@@ -11,9 +11,9 @@ Split the Slip is a free web app for splitting a restaurant bill with friends. I
 1. **People:** add everyone at the table, and tap ★ for whoever paid.
 2. **Receipt:** tap **Scan receipt photo** to take a photo or pick one from your library, or type items in by hand. Then tap names under each item to say who had it. Shared items are split evenly between the people tapped.
 3. **Tax and tip:** enter the tax and a tip (% or $). Choose **Proportional** (people who ordered more pay more) or **Even**.
-4. **Who owes what:** see each person's total, tap a name for the full breakdown, and tap **Copy for group chat**.
+4. **Who owes what:** everyone's total stays in the bar at the bottom as you tap. Tap a name for the full breakdown, then tap **Send** to share the split to your group chat or copy it.
 
-Totals are rounded so they always add up to the exact cent. The copy button stays off until every item has been assigned, so nobody gets sent a wrong amount.
+Totals are rounded so they always add up to the exact cent. Send stays off until every item has been assigned, so nobody gets sent a wrong amount. Tap **Everyone** on a shared dish to split it across the whole table.
 
 ## Privacy
 
