@@ -59,8 +59,8 @@ All P0 and P1 requirements below shipped in v1.0; P2 items are on the roadmap.
 | F11 | Scan while items exist asks: add to them or replace them, with Undo | P1 | Shipped |
 | F12 | New bill with 8-second Undo | P1 | Shipped |
 | F13 | Bill saved in the browser between visits | P1 | Shipped |
-| F14 | One-tap "split everything evenly" and an "Everyone" chip | P2 | Roadmap |
-| F15 | Native share sheet and Venmo / Cash App request links | P2 | Roadmap |
+| F14 | "Everyone" chip per item (no whole-bill button; Tier 1 release) | P2 | Roadmap |
+| F15 | Share sheet with app link (Tier 1 release); Venmo / Cash App requests stay in v2 | P2 | Roadmap |
 
 **Scope history.** The first prioritization pass (Nov 24) used MoSCoW under a role-play limit of 6 of 10 features. It surfaced a hidden gap: cutting "calculation breakdown" left the app with no output, so the feature was scoped down into per-person totals (core) plus the full breakdown (proof). Shared items, the breakdown and text sharing were later kept because they cost almost nothing to build.
 
