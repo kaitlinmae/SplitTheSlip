@@ -153,3 +153,54 @@ test('parser: uses the line total when a unit price is also shown', () => {
   const r = parseReceipt('2 Fish Tacos 7.00 14.00');
   assert.deepEqual(r.items.map(i => [i.name, i.price]), [['2 Fish Tacos', 14]]);
 });
+
+test('parser: fee lines with a % are items; auto gratuity is tip; tip suggestions are skipped', () => {
+  const r = parseReceipt(`1 Michigan Avenue Margarita $14.00
+Restaurant Fee (3.00%) $2.79
+Gratuity 18% 15.00
+20% Tip 23.55`);
+  assert.deepEqual(r.items.map(i => [i.name, i.price]), [['1 Michigan Avenue Margarita', 14], ['Restaurant Fee (3.00%)', 2.79]]);
+  assert.equal(r.tip, 15);
+});
+
+test('parser: keeps every printed total (bill total and total with tip)', () => {
+  const r = parseReceipt('Subtotal $95.94\nTax $11.31\nTotal $107.25\nTotal $107.25 $16.77 $124.02');
+  assert.deepEqual(r.totals, [107.25, 124.02]);
+  assert.equal(r.total, 107.25);
+});
+
+test('parser: real-photo noise — junk after prices, split lines, junk before quantity', () => {
+  const r = parseReceipt(`11)     1 Medium Stuffed DD Chicago Classic                  cL
+;                              $37.15      Ce
+%      1 Millennium Park Lemonade        $14.00
+Had      1 Michigan Avenue Margarita        $14.00       ENN oo
+-    y Restaurant Fee (3.00%)           $2.79     | Oa
+Ww     Anna C               7/29/2026, 9:42 PM      —-`);
+  assert.deepEqual(r.items.map(i => [i.name, i.price]), [
+    ['1 Medium Stuffed DD Chicago Classic', 37.15], ['1 Millennium Park Lemonade', 14],
+    ['1 Michigan Avenue Margarita', 14], ['Restaurant Fee (3.00%)', 2.79]]);
+});
+
+test('parser: nothing below Subtotal becomes an item', () => {
+  const r = parseReceipt('Burger 12.00\nSubtotal\n$12.00\nTEE of\n-107.25\n7 Amount 107.05\nTax $1.00\nTotal $13.00');
+  assert.deepEqual(r.items.map(i => i.name), ['Burger']);
+  assert.equal(r.tax, 1);
+});
+
+test('parser: records the subtotal; payment rows never become tip', () => {
+  const r = parseReceipt(`2 Frozen Chile Mango Margarita     $28.00
+A    Subtotal                               |  Ned
+$95.94    ~   ;
+VISA 4886       107 5    Tip Payment
+oo   a   18.77   124,02
+Tax
+$11.31`);
+  assert.equal(r.subtotal, 95.94);
+  assert.equal(r.tip, 0);
+  assert.equal(r.tax, 11.31);
+});
+
+test('parser: strips junk tokens from the end of names', () => {
+  const r = parseReceipt('1 Margherita Pizza pj,y; 19.50\nRestaurant Fee (3.00%) $2.79');
+  assert.deepEqual(r.items.map(i => i.name), ['1 Margherita Pizza', 'Restaurant Fee (3.00%)']);
+});
