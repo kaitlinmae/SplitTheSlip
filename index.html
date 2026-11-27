@@ -20,11 +20,11 @@
    COLOUR and TYPE: lavender-white background, white cards, pastel lavender/peach/mint/sky accents; DM Sans with tabular figures.
    LAYOUT: one centred column (max 520px): receipt, people, tax & tip, who owes what. */
 :root{color-scheme:light dark;
- --bg:light-dark(#f7f4fb,#17161c);--paper:light-dark(#ffffff,#211f28);--ink:light-dark(#3a3646,#ece8f4);
- --quiet:light-dark(#6e6980,#a19cae);--rule:light-dark(#ece8f2,#322f3b);--accent:light-dark(#cdbdf3,#7f6bc4);
- --accent-ink:light-dark(#2e2547,#ffffff);--accent-text:light-dark(#7b5ccc,#c4b3f5);--chip:light-dark(#f4f1f9,#2a2732);--sel:light-dark(#e9e1fc,#433a66);
- --lav:light-dark(#e6ddfb,#3a3159);--peach:light-dark(#ffe1d4,#4a3029);--mint:light-dark(#d6f2e4,#24402f);--sky:light-dark(#d8e9fb,#233648);
- --good:light-dark(#2f7350,#8fdcb2);--warn:light-dark(#9a5f12,#f2c27d);--warnbar:light-dark(#e3b06a,#f2c27d)}
+ --bg:#f7f4fb;--paper:#ffffff;--ink:#3a3646;--quiet:#6e6980;--rule:#ece8f2;--accent:#cdbdf3;--accent-ink:#2e2547;--accent-text:#7b5ccc;--chip:#f4f1f9;--sel:#e9e1fc;--lav:#e6ddfb;--peach:#ffe1d4;--mint:#d6f2e4;--sky:#d8e9fb;--good:#2f7350;--warn:#9a5f12;--warnbar:#e3b06a;--chip-on-ink:#fff;--err:#c0566b}
+@media (prefers-color-scheme:dark){:root:not([data-theme=light]){
+ --bg:#17161c;--paper:#211f28;--ink:#ece8f4;--quiet:#a19cae;--rule:#322f3b;--accent:#7f6bc4;--accent-ink:#ffffff;--accent-text:#c4b3f5;--chip:#2a2732;--sel:#433a66;--lav:#3a3159;--peach:#4a3029;--mint:#24402f;--sky:#233648;--good:#8fdcb2;--warn:#f2c27d;--warnbar:#f2c27d;--chip-on-ink:#17161c;--err:#f29aa9}}
+:root[data-theme=dark]{
+ --bg:#17161c;--paper:#211f28;--ink:#ece8f4;--quiet:#a19cae;--rule:#322f3b;--accent:#7f6bc4;--accent-ink:#ffffff;--accent-text:#c4b3f5;--chip:#2a2732;--sel:#433a66;--lav:#3a3159;--peach:#4a3029;--mint:#24402f;--sky:#233648;--good:#8fdcb2;--warn:#f2c27d;--warnbar:#f2c27d;--chip-on-ink:#17161c;--err:#f29aa9}
 :root[data-theme=light]{color-scheme:light}:root[data-theme=dark]{color-scheme:dark}
 *{box-sizing:border-box;min-width:0}
 body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 "DM Sans",system-ui,sans-serif;overflow-x:clip}
@@ -63,7 +63,7 @@ button,input,select{font:inherit;color:inherit}
 .choice p{margin:0 0 10px;font-size:15px}
 label.linkbtn{display:inline-flex;align-items:center;font-size:14px}
 .status{font-size:14px;color:var(--quiet)}
-.status.err{color:light-dark(#c0566b,#f29aa9)}
+.status.err{color:var(--err)}
 .items{list-style:none;margin:0;padding:0}
 .item{border-top:1px solid var(--rule);padding:12px 0}
 .item:first-child{border-top:0}
@@ -77,7 +77,7 @@ label.linkbtn{display:inline-flex;align-items:center;font-size:14px}
 .del:hover{background:var(--chip);color:var(--accent)}
 .chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
 .chip{min-height:36px;padding:0 14px;border-radius:999px;border:1.5px solid transparent;background:var(--chip);cursor:pointer;font-size:14px;font-weight:500;transition:background .15s}
-.chip[aria-pressed=true]{background:var(--accent-text);border-color:var(--accent-text);color:light-dark(#fff,#17161c)}
+.chip[aria-pressed=true]{background:var(--accent-text);border-color:var(--accent-text);color:var(--chip-on-ink)}
 .chip[aria-pressed=true]::before{content:"✓ "}
 .share-note{font-size:12.5px;color:var(--quiet);margin-left:4px;align-self:center}
 .check{display:flex;justify-content:space-between;gap:10px;margin-top:14px;padding-top:14px;border-top:1px solid var(--rule);font-weight:600}
