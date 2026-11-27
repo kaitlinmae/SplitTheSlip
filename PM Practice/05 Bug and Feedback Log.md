@@ -6,10 +6,12 @@ Every issue found through owner testing and the release review, with its root ca
 
 ## Issues
 
-16 of 20 issues are fixed, 2 low-severity items are still open, and 2 reports turned out not to be bugs. Issues 1 and 2 come from the Nov 24 build; the rest from Nov 26 testing and review.
+18 of 22 issues are fixed, 2 low-severity items are still open, and 2 reports turned out not to be bugs. Issues 1 and 2 come from the Nov 24 build; the rest from Nov 26 testing and review.
 
 | # | Issue | Root cause | Fix | Severity | Status |
 | --- | --- | --- | --- | --- | --- |
+| 22 | Second real receipt read as noise; "SER" shown as an item | Receipt tilted about 20° plus sideways; light wooden table treated as paper; fixed-width font lines up in columns too | Search every angle, try a quarter turn, find paper by colour against the lighting, drop capital scraps | High | Fixed |
+| 21 | No way back to the first screen from the example | No link or button back | Pinned "Example bill" banner with "← Back to start" | Medium | Fixed |
 | 20 | Breakdown lines can differ by a cent from a person's Items total | Each line rounds on its own; the total uses exact allocation | Show each person's exact cent share per line | Low | Open |
 | 19 | Screen readers announce every 1% of scan progress; price fields all called "Price" | Live region updates too often; generic labels | Throttle updates; label "Price for &lt;item&gt;" | Low | Open |
 | 18 | Long item names cut off | Item name was a single-line field | Wrapping text box that grows; breakdown keeps prices on screen | Medium | Fixed |

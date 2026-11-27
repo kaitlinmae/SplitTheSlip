@@ -234,3 +234,34 @@ test('parser: tip from an Amount / Tip / Payment row (even with a misread tip di
   const misread = parseReceipt('Burger 95.94\nSubtotal $95.94\n|  y                $107.25 $18.77  $124.02');
   assert.equal(misread.tip, 16.77);
 });
+
+test('parser: item name wrapping onto a second line joins with its price line', () => {
+  const r = parseReceipt(`1 Chicken Katsu Parmesan $26.00
+1 Hill Family Estate "The Barrel Blend"
+GLS)   $14.00
+1 World Whiskey Ao Special $22.00
+Ordered:
+Tea 3.00`);
+  assert.deepEqual(r.items.map(i => [i.name, i.price]), [
+    ['1 Chicken Katsu Parmesan', 26], ['1 Hill Family Estate "The Barrel Blend" (GLS)', 14], ['1 World Whiskey Ao Special', 22], ['Tea', 3]]);
+});
+
+test('parser: lone capital scraps are noise; real short names with a quantity stay', () => {
+  const r = parseReceipt('SER 4.00\n1 IPA 7.00\nPho Ga 15.00');
+  assert.deepEqual(r.items.map(i => i.name), ['1 IPA', 'Pho Ga']);
+});
+
+test('parser: tax from total minus subtotal fixes a misread digit or a missing tax line', () => {
+  const misread = parseReceipt('1 Mala Lamb $22.00\n1 Bread $99.00\nSubtotal $121.00\nTax $10.51\nTotal $131.57');
+  assert.equal(misread.tax, 10.57);
+  const missing = parseReceipt('1 Pizza $95.94\nSubtotal\n$95.94\nTotal $107.25 $16.77 $124.02');
+  assert.equal(missing.tax, 11.31);
+  const fine = parseReceipt('Burger 20.00\nSubtotal 20.00\nTax 1.80\nTotal 21.80');
+  assert.equal(fine.tax, 1.8);
+});
+
+test('parser: a bare amount just above the subtotal counts as the bill total', () => {
+  const r = parseReceipt('1 Pizza $95.94\nSubtotal $95.94\n$107.25\ny  or Tie Payment');
+  assert.equal(r.tax, 11.31);
+  assert.equal(r.items.length, 1);
+});

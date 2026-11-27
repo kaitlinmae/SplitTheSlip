@@ -8,6 +8,7 @@ Every release from the first build to v1.0, newest first. Testers should reload 
 
 | Version | Date | What changed |
 | --- | --- | --- |
+| 1.1.3 | Nov 27 | Reads receipts at any angle (tilted and sideways), finds the paper by colour so wooden tables aren't read, judges colour against the room's lighting, joins item names that wrap onto two lines, drops capital-letter scraps ("SER"), and works out tax from total minus subtotal when it's misread or missing; tuned on a second real receipt |
 | 1.1.2 | Nov 27 | Example bill shows a pinned banner with Penny and a clear "← Back to start" button; tapping names, Everyone, ★ or tax and tip keeps it an example, adding or editing people or items makes it your own bill (owner feedback) |
 | 1.1.1 | Nov 27 | "← Back to start" link returns to the first screen from the example or a blank bill (owner feedback) |
 | 1.1 | Nov 27 | Tier 1 conversion release: first screen with Penny the mascot (sample dinner behind "See an example"), Everyone chip on each item, sticky who-owes-what bar with Send, send screen with Share to group chat, Copy text and an app-link switch, new message "🧾 The split is in!", Penny cheers when a scan matches the subtotal, link preview image and app icons |

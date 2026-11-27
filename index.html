@@ -606,7 +606,15 @@ function parseReceipt(text){
     let name = cleanName(rawName);
     // below Subtotal, only borrow a short label line ("Tax", "Total") — never e.g. "VISA 4886 Tip Payment"
     if(!looksLikeName(name) && pending && (!pastItems || (/sub\s*-?\s*total|\btax\b|\btotal\b|\btip\b|gratuity/i.test(pending) && !/visa|master|amex|card|payment|amount|cash/i.test(pending)))) name = pending;
+    // An item name that wraps onto a second line, with the price on the second line:
+    // "1 Hill Family Estate "The Barrel Blend"" then "(GLS)   $14.00" -> one item.
+    else if(!pastItems && pending && /^\d{1,2}\s/.test(pending) && !/^\d{1,2}\s/.test(name) && (name.split(' ').length <= 2 || /^\(|\)$/.test(name))){
+      const tail = /\)$/.test(name) && !/\(/.test(name) ? '(' + name : name;
+      name = pending + ' ' + tail;
+    }
     pending = '';
+    // A bare amount below Subtotal, a bit above it, is the bill total whose label was too faint to read
+    if(pastItems && !/[a-z]{3}/i.test(name) && out.subtotal > 0 && price > out.subtotal && price <= out.subtotal*1.3){ out.totals.push(price); continue; }
     const low = name.toLowerCase();
     if(/sub\s*-?\s*total/.test(low)){ out.subtotal = price; continue; }
     if(/\b(tax|hst|gst|pst|vat)\b/.test(low)){ out.tax += price; continue; }
@@ -616,7 +624,18 @@ function parseReceipt(text){
     if(/total|balance|amount due|\bdue\b/.test(low)){ out.totals.push(price); out.total = out.total || price; continue; }
     if(pastItems || RECEIPT_SKIP.test(name)) continue;
     if(!looksLikeName(name)) continue;
+    if(/^[A-Z]{1,3}\)?$/.test(name)) continue;   // a lone 1-3 letter capital scrap ("SER") with no quantity is OCR noise
     out.items.push({name:name.slice(0,60), price});
+  }
+  // Use the receipt's own maths: once the items match the printed subtotal, tax = bill total - subtotal.
+  // Fixes a misread tax digit (10.51 -> 10.57) and fills in a tax line that couldn't be read.
+  const sub = Math.round(out.subtotal*100), itemsSum = Math.round(out.items.reduce((a,i)=>a+i.price,0)*100);
+  if(sub > 0 && Math.abs(itemsSum - sub) <= 1){
+    const above = out.totals.map(t=>Math.round(t*100)).filter(t=>t > sub);
+    if(above.length){
+      const d = Math.min(...above) - sub, tax = Math.round(out.tax*100);
+      if(d <= sub*0.2 && (tax === 0 || (Math.abs(tax - d) < 100 && tax !== d))) out.tax = d/100;
+    }
   }
   return out;
 }
@@ -646,8 +665,8 @@ function otsu(v){
   return th;
 }
 function findSkew(bin,w,h){
-  // try -10..10° and the same range turned sideways (80..100°); keep the angle where
-  // dark pixels line up into the sharpest rows. Upside-down is settled later by the reader.
+  // Keep the angle where dark pixels line up into the sharpest rows.
+  // Upside-down is settled later by the reader (it also tries the photo turned 180°).
   const step=Math.max(1,Math.round(w/500)), pts=[];
   // Only use dark pixels on a thin stroke edge (dark with light right next to it). Text is
   // nearly all edge; big dark shapes around the receipt (hands, glasses, shadows) mostly aren't.
@@ -657,28 +676,38 @@ function findSkew(bin,w,h){
     if((l&&r) || (u&&d) || (l&&!r&&bin[i+2]) ) pts.push(x,y);
   }
   if(pts.length<200) return 0;
+  // Receipts can sit at any angle (tilted, sideways, or both), so try every angle,
+  // then refine around the best one.
+  const off=Math.ceil((w+h)/step)+2, hist=new Int32Array(off*2+4);
+  const score=a=>{ const r=a*Math.PI/180, c=Math.cos(r), sn=Math.sin(r); hist.fill(0);
+    for(let i=0;i<pts.length;i+=2) hist[Math.round((pts[i+1]*c - pts[i]*sn)/step)+off]++;
+    let sc=0; for(let k=0;k<hist.length;k++) sc+=hist[k]*hist[k]; return sc; };
   let bestA=0,bestS=-1;
-  const angles=[]; for(let a=-10;a<=10.001;a+=0.5){ angles.push(a, a+90); }
-  for(const a of angles){
-    const r=a*Math.PI/180, c=Math.cos(r), s=Math.sin(r), rows=new Map();
-    for(let i=0;i<pts.length;i+=2){ const k=Math.round((pts[i+1]*c - pts[i]*s)/step); rows.set(k,(rows.get(k)||0)+1); }
-    let sc=0; for(const v of rows.values()) sc+=v*v;
-    if(sc>bestS){ bestS=sc; bestA=a; }
-  }
+  for(let a=-90;a<90;a+=1){ const sc=score(a); if(sc>bestS){ bestS=sc; bestA=a; } }
+  for(let a=bestA-1;a<=bestA+1.001;a+=0.25){ const sc=score(a); if(sc>bestS){ bestS=sc; bestA=a; } }
   return bestA;
 }
-function receiptBox(g,w,h){
+function receiptBox(g,w,h,px){
   // Find the largest bright area (the paper) on a small copy of the photo.
   const f=Math.max(1,Math.round(Math.max(w,h)/300)), sw=Math.floor(w/f), sh=Math.floor(h/f), small=new Uint8Array(sw*sh);
-  for(let y=0;y<sh;y++) for(let x=0;x<sw;x++) small[y*sw+x]=Math.min(255,g[(y*f)*w+x*f]|0);
+  const neutral=new Uint8Array(sw*sh);   // 1 = grey/white like receipt paper, even in shadow
+  // Judge colour relative to the photo's lighting: the brightest tenth of the photo is mostly paper,
+  // so its average colour is the light's tint (warm restaurant light makes white paper look yellow).
+  const lum=[]; for(let y=0;y<sh;y++) for(let x=0;x<sw;x++) lum.push(g[(y*f)*w+x*f]);
+  const cut=lum.slice().sort((a,b)=>a-b)[Math.floor(lum.length*0.9)];
+  let cr=0,cg=0,cb=0,cn=0;
+  for(let y=0;y<sh;y++) for(let x=0;x<sw;x++){ const j=(y*f)*w+x*f; if(g[j]<cut) continue; const q=j*4; cr+=px[q]; cg+=px[q+1]; cb+=px[q+2]; cn++; }
+  const cm=(cr+cg+cb)/3/Math.max(1,cn), kr=cm/Math.max(1,cr/cn), kg=cm/Math.max(1,cg/cn), kb=cm/Math.max(1,cb/cn);
+  for(let y=0;y<sh;y++) for(let x=0;x<sw;x++){ const j=(y*f)*w+x*f, q=j*4, r=px[q]*kr, gg=px[q+1]*kg, b=px[q+2]*kb, mx=Math.max(r,gg,b), mn=Math.min(r,gg,b);
+    small[y*sw+x]=Math.min(255,g[j]|0); neutral[y*sw+x]= (mx-mn) <= Math.max(18, mx*0.17) ? 1 : 0; }
   const th=Math.max(otsu(small), 110), seen=new Uint8Array(sw*sh);
   let best=null, stack=[];
   for(let s0=0;s0<sw*sh;s0++){
-    if(seen[s0] || small[s0]<th) continue;
+    if(seen[s0] || small[s0]<th || !neutral[s0]) continue;
     let n=0, x0=sw, x1=0, y0=sh, y1=0; stack.length=0; stack.push(s0); seen[s0]=1;
     while(stack.length){ const i=stack.pop(), x=i%sw, y=(i/sw)|0; n++;
       if(x<x0)x0=x; if(x>x1)x1=x; if(y<y0)y0=y; if(y>y1)y1=y;
-      for(const j of [i-1,i+1,i-sw,i+sw]){ if(j<0||j>=sw*sh||seen[j]||small[j]<th) continue; if((j===i-1&&x===0)||(j===i+1&&x===sw-1)) continue; seen[j]=1; stack.push(j); } }
+      for(const j of [i-1,i+1,i-sw,i+sw]){ if(j<0||j>=sw*sh||seen[j]||small[j]<th||!neutral[j]) continue; if((j===i-1&&x===0)||(j===i+1&&x===sw-1)) continue; seen[j]=1; stack.push(j); } }
     if(!best || n>best.n) best={n,x0,x1,y0,y1,seed:s0};
   }
   if(!best) return null;
@@ -688,11 +717,13 @@ function receiptBox(g,w,h){
   let n=0; best.x0=sw; best.x1=0; best.y0=sh; best.y1=0;
   while(stack.length){ const i=stack.pop(), x=i%sw, y=(i/sw)|0; n++;
     if(x<best.x0)best.x0=x; if(x>best.x1)best.x1=x; if(y<best.y0)best.y0=y; if(y>best.y1)best.y1=y;
-    for(const j of [i-1,i+1,i-sw,i+sw]){ if(j<0||j>=sw*sh||lab[j]||small[j]<tl) continue; if((j===i-1&&x===0)||(j===i+1&&x===sw-1)) continue; lab[j]=1; stack.push(j); } }
+    for(const j of [i-1,i+1,i-sw,i+sw]){ if(j<0||j>=sw*sh||lab[j]||small[j]<tl||!neutral[j]) continue; if((j===i-1&&x===0)||(j===i+1&&x===sw-1)) continue; lab[j]=1; stack.push(j); } }
   if(n < sw*sh*0.08) return null;           // no clear receipt: use the whole photo
   for(let y=0;y<sh;y++){ let a=-1,b=-1; for(let x=0;x<sw;x++) if(lab[y*sw+x]){ if(a<0)a=x; b=x; } for(let x=a;x>=0&&x<=b;x++) lab[y*sw+x]=1; }
+  // Trim a thin border off the paper: its own edges (and their shadows) are long straight
+  // lines that would otherwise outweigh the text when straightening.
   const mask = (x,y)=>{ const sx=Math.min(sw-1,(x/f)|0), sy=Math.min(sh-1,(y/f)|0);
-    for(let dy=-1;dy<=1;dy++) for(let dx=-1;dx<=1;dx++){ const xx=sx+dx, yy=sy+dy; if(xx>=0&&yy>=0&&xx<sw&&yy<sh&&lab[yy*sw+xx]) return true; } return false; };
+    for(let dy=-1;dy<=1;dy++) for(let dx=-1;dx<=1;dx++){ const xx=sx+dx, yy=sy+dy; if(xx<0||yy<0||xx>=sw||yy>=sh||!lab[yy*sw+xx]) return false; } return true; };
   const m=Math.round(Math.max(sw,sh)*0.02);
   return {mask, x:Math.max(0,(best.x0-m)*f), y:Math.max(0,(best.y0-m)*f), w:Math.min(w,(best.x1+m+1)*f)-Math.max(0,(best.x0-m)*f), h:Math.min(h,(best.y1+m+1)*f)-Math.max(0,(best.y0-m)*f)};
 }
@@ -706,7 +737,7 @@ async function prepForOcr(file, useMask=true){
   const d=ctx.getImageData(0,0,w,h), px=d.data, g=new Float32Array(w*h);
   for(let i=0,j=0;i<px.length;i+=4,j++) g[j]=0.299*px[i]+0.587*px[i+1]+0.114*px[i+2];
   const bg=boxMean(g,w,h,Math.max(12,Math.round(Math.max(w,h)/40)));
-  const box=useMask ? receiptBox(g,w,h) : null;
+  const box=useMask ? receiptBox(g,w,h,px) : null;
   const v=new Uint8Array(w*h);
   for(let j=0;j<v.length;j++){ const n=g[j]/(bg[j]+1); v[j]=Math.max(0,Math.min(255,Math.round((n-0.5)/0.45*255))); }
   const th=otsu(v), bin=new Uint8Array(w*h);
@@ -714,15 +745,15 @@ async function prepForOcr(file, useMask=true){
   if(box) for(let y=0;y<h;y++) for(let x=0;x<w;x++) if(!box.mask(x,y)) bin[y*w+x]=255;   // blank out everything that isn't paper
   for(let i=0,j=0;i<px.length;i+=4,j++){ px[i]=px[i+1]=px[i+2]=bin[j]; px[i+3]=255; }
   ctx.putImageData(d,0,0);
-  let a=findSkew(bin,w,h);
+  // Returns the cleaned-up (unrotated) canvas and the angle its text lines run at.
   if(box && (box.w<w*0.97 || box.h<h*0.97)){   // keep only the receipt, so background clutter isn't read
     const cc=document.createElement('canvas'); cc.width=box.w; cc.height=box.h;
     cc.getContext('2d').drawImage(c,box.x,box.y,box.w,box.h,0,0,box.w,box.h);
     const cb=new Uint8Array(box.w*box.h);
     for(let y=0;y<box.h;y++) for(let x=0;x<box.w;x++) cb[y*box.w+x]=bin[(y+box.y)*w+x+box.x];
-    a=findSkew(cb,box.w,box.h); return rotateCanvas(cc,a);
+    return {c:cc, a:findSkew(cb,box.w,box.h)};
   }
-  return rotateCanvas(c,a);
+  return {c, a:findSkew(bin,w,h)};
 }
 function rotateCanvas(c,a){
   const w=c.width, h=c.height;
@@ -746,18 +777,22 @@ async function readWithOcr(file){
     logger: m=>{ if(m.status==='recognizing text') status(`Reading receipt… ${Math.round((m.progress||0)*100)}%`); }});
   try{
     await worker.setParameters({tessedit_pageseg_mode: '6', preserve_interword_spaces:'1'});
-    // Try: receipt-only crop, then the same turned 180°, then (only if still weak) the whole photo.
-    // Stop as soon as a result clearly checks out, so most photos need just one pass.
+    // Try the receipt-only crop straightened, then turned 180°, then a quarter turn either way
+    // (fixed-width receipt fonts line up in columns too, so rows vs columns can be ambiguous),
+    // and only if all of that is weak, the whole photo. Stop as soon as a result checks out.
     let best = null, masked = null, full = null;
+    const getMasked = async()=> masked || (masked = await prepForOcr(file, true));
+    const getFull = async()=> full || (full = await prepForOcr(file, false));
     const tries = [
-      async()=> masked = await prepForOcr(file, true),
-      async()=> turn180(masked),
-      async()=> full = await prepForOcr(file, false),
-      async()=> turn180(full)];
-    const msgs = ['', 'Trying the photo the other way up…', 'Trying the whole photo…', 'Trying the whole photo the other way up…'];
+      ['', async()=>{ const q=await getMasked(); return rotateCanvas(q.c,q.a); }],
+      ['Trying the photo the other way up…', async()=>{ const q=await getMasked(); return turn180(rotateCanvas(q.c,q.a)); }],
+      ['Trying the photo turned sideways…', async()=>{ const q=await getMasked(); return rotateCanvas(q.c,q.a+90); }],
+      ['Trying the photo turned the other way…', async()=>{ const q=await getMasked(); return rotateCanvas(q.c,q.a-90); }],
+      ['Trying the whole photo…', async()=>{ const q=await getFull(); return rotateCanvas(q.c,q.a); }],
+      ['Trying the whole photo the other way up…', async()=>{ const q=await getFull(); return turn180(rotateCanvas(q.c,q.a)); }]];
     for(let t=0;t<tries.length;t++){
-      if(msgs[t]) status(msgs[t]);
-      const cv = await tries[t]();
+      if(tries[t][0]) status(tries[t][0]);
+      const cv = await tries[t][1]();
       const r = await worker.recognize(cv);
       const parsed = parseReceipt(r.data.text), conf = r.data.confidence||0;
       const sum = Math.round(parsed.items.reduce((a,i)=>a+i.price,0)*100), sub = Math.round((parsed.subtotal||0)*100);
