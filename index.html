@@ -206,7 +206,7 @@ textarea.fallback{width:100%;min-height:120px;margin-top:8px;font:13px "IBM Plex
   <p class="w-trust">Free · No sign-up · Your photo never leaves your phone</p>
   <button type="button" class="linkbtn quiet" id="wExample">See an example</button>
  </div>
- <footer class="foot">© 2026 Kaitlin Mae Frani. All rights reserved.</footer>
+ <footer class="foot">© 2026 Kaitlin Mae Frani. All rights reserved. · v1.1.6</footer>
 </main>
 <div class="wrap" id="app">
  <header>
@@ -262,7 +262,7 @@ textarea.fallback{width:100%;min-height:120px;margin-top:8px;font:13px "IBM Plex
   <div class="results" id="results"></div>
   <div class="row" style="margin-top:14px"><button class="btn primary" id="openSend" type="button">Send the split</button></div>
  </section>
- <footer class="foot">© 2026 Kaitlin Mae Frani. All rights reserved.</footer>
+ <footer class="foot">© 2026 Kaitlin Mae Frani. All rights reserved. · v1.1.6</footer>
 </div>
 <div class="owebar" id="owebar" hidden><div class="owebar-in">
  <div class="owe-txt" aria-live="polite"><b id="oweMain"></b><small id="oweSub"></small></div>
@@ -576,9 +576,16 @@ function looksLikeName(name){
   const words = name.split(' ').filter(w=>/[A-Za-z]{3,}/.test(w));
   return words.length > 0 && letters.length/chars.length >= 0.55;
 }
+// "Sublotal", "Subtotai", "5ubtota1": a short label within a few letters of the word
+function nearWord(s, w){
+  const a = s.replace(/[^a-z]/g,''); if(a.length < 6 || a.length > w.length+2) return false;
+  let prev = Array.from({length:w.length+1},(_,j)=>j);
+  for(let i=1;i<=a.length;i++){ const cur=[i]; for(let j=1;j<=w.length;j++) cur[j]=Math.min(prev[j]+1, cur[j-1]+1, prev[j-1]+(a[i-1]===w[j-1]?0:1)); prev=cur; }
+  return prev[w.length] <= 2;
+}
 function parseReceipt(text){
   const out={items:[], tax:0, tip:0, tipPct:0, total:0, totals:[], subtotal:0};
-  let taxSeen = false; const after = [];   // a tax label anywhere; amounts printed below the subtotal
+  let taxSeen = false; const after = [], seq = [], itemAt = [];   // seq: every amount in order   // a tax label anywhere; amounts printed below the subtotal
   let pending = '';   // a name line whose price ended up on the next line
   let pastItems = false;   // below Subtotal only tax, totals and payment lines follow
   const PRICE = /(-)?\$?\s?([\dOoDQSsIl|iBZz]{1,4})\s?[.,]\s?([\dOoDQSsIl|iBZz]{2})(?![\d%])\s*(-)?/g;
@@ -593,6 +600,7 @@ function parseReceipt(text){
     if(!/^\d+\.\d\d$/.test(digits)) continue;
     let price = +digits; if(m[1]||m[4]) price = -price;
     if(pastItems) after.push(Math.round(price*100));
+    seq.push(Math.round(price*100));
     // an item line can also show a unit price before the line total ("2 Tacos 7.00 14.00")
     const rawName = line.slice(0,m.index).replace(/\s\$?\d{1,4}[.,]\d{2}\s*$/,'');
     // "Amount  Tip  Payment" row, e.g. "$107.25 $16.77 $124.02": tip = paid total − bill total
@@ -619,7 +627,7 @@ function parseReceipt(text){
     // A bare amount below Subtotal, a bit above it, is the bill total whose label was too faint to read
     if(pastItems && !/[a-z]{3}/i.test(name) && out.subtotal > 0 && price > out.subtotal && price <= out.subtotal*1.3){ out.totals.push(price); continue; }
     const low = name.toLowerCase();
-    if(/sub\s*-?\s*tot/.test(low)){ out.subtotal = price; pastItems = true; continue; }
+    if(/sub\s*-?\s*tot/.test(low) || nearWord(low, 'subtotal')){ out.subtotal = price; pastItems = true; continue; }
     // The subtotal, recognised by its maths: a "total" line (or one whose label is unreadable) whose
     // amount equals the items above it. Nothing below it can be an item.
     const running = Math.round(out.items.reduce((a,i)=>a+i.price,0)*100);
@@ -636,7 +644,24 @@ function parseReceipt(text){
     if(!looksLikeName(name)) continue;
     if(/^[A-Z]{1,3}\)?$/.test(name)) continue;   // a lone 1-3 letter capital scrap ("SER") with no quantity is OCR noise
     if(price === 0) continue;   // $0.00 lines (included or all-you-can-eat items) don't change anyone's share
-    out.items.push({name:name.slice(0,60), price});
+    out.items.push({name:name.slice(0,60), price}); itemAt.push(seq.length-1);
+  }
+  // No subtotal found, but one "item" equals everything above it and a slightly larger total follows:
+  // that line was the subtotal with an unreadable label. Drop it (and anything after it) from the items.
+  if(!out.subtotal && out.items.length >= 3){
+    let run = 0;
+    for(let k=0;k<out.items.length;k++){
+      const p = Math.round(out.items[k].price*100);
+      if(k >= 2 && p === run && p > 0){
+        const later = seq.slice(itemAt[k]+1);
+        if(later.some(t => t > p && t <= p*1.3)){
+          out.totals.push(...later.filter(t => t > p).map(t => t/100));
+          for(const t of later) if(t < p && t > 0) after.push(t);
+          out.subtotal = p/100; out.items = out.items.slice(0,k); break;
+        }
+      }
+      run += p;
+    }
   }
   // Use the receipt's own maths: once the items match the printed subtotal, tax = bill total - subtotal.
   // Fixes a misread tax digit (10.51 -> 10.57) and a tax label that couldn't be read ("( $11.29").

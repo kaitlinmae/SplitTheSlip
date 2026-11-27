@@ -8,6 +8,7 @@ Every release from the first build to v1.0, newest first. Testers should reload 
 
 | Version | Date | What changed |
 | --- | --- | --- |
+| 1.1.6 | Nov 27 | Catches a badly garbled "Subtotal" ("Sublotal", "5ubtota1", or unreadable) so it's never added as an item; shows the version number in the footer so testers can tell whether their phone has the latest copy |
 | 1.1.5 | Nov 27 | Tax and tip come only from the receipt: new bills start at 0% tip (was 18%), a scan with no tax or tip sets both to $0 instead of keeping old values, and tax is no longer filled in from total − subtotal unless the receipt prints a tax line or that amount. If the total is higher than the items with no tax listed, the app says so |
 | 1.1.4 | Nov 27 | Recognises the subtotal by its maths (a line equal to the items above it), catches garbled "Total" labels so the total is never added as an item, and skips $0.00 items such as all-you-can-eat lines; tuned on a third real receipt |
 | 1.1.3 | Nov 27 | Reads receipts at any angle (tilted and sideways), finds the paper by colour so wooden tables aren't read, judges colour against the room's lighting, joins item names that wrap onto two lines, drops capital-letter scraps ("SER"), and works out tax from total minus subtotal when it's misread or missing; tuned on a second real receipt |

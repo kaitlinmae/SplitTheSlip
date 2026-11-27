@@ -302,3 +302,17 @@ test('parser: no tax or tip listed means both stay 0, never guessed', () => {
   const taxListed = parseReceipt('Burger 20.00\nSubtotal 20.00\nSales Tax\nTotal 21.80');
   assert.equal(taxListed.tax, 1.8);   // tax line printed but its amount unreadable
 });
+
+test('parser: a badly garbled "Subtotal" is never added as an item', () => {
+  for (const label of ['Sublotal', 'Subtotai', '5ubtota1', 'Sbtotal']) {
+    const r = parseReceipt(`1 Strawberry Soju $12.00\n2 Premiums $110.00\n1 Salmon Crudo $0.00\n${label} $122.00\nTax $11.29\nTotal $133.29`);
+    assert.deepEqual(r.items.map(i => i.price), [12, 110], label);
+    assert.equal(r.subtotal, 122, label);
+    assert.equal(r.tax, 11.29, label);
+  }
+  // label unreadable entirely ("Xqzwv"), caught by the maths after the read
+  const r = parseReceipt('1 Strawberry Soju $12.00\n2 Premiums $110.00\n1 Hamachi Jala $5.00\nXqzwv Plmno $127.00\n( $11.29\nI $138.29');
+  assert.deepEqual(r.items.map(i => i.price), [12, 110, 5]);
+  assert.equal(r.subtotal, 127);
+  assert.equal(r.tax, 11.29);
+});
