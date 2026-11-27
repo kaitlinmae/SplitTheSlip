@@ -125,3 +125,31 @@ test('parser: reads discounts, $ signs, commas and tax flags', () => {
   assert.deepEqual(r.items.map(i => [i.name, i.price]), [['Burger', 12], ['Happy hour', -3], ['Fries', 4.5], ['Soda', 2.5]]);
   assert.equal(r.tip, 5);
 });
+
+test('parser: cleans OCR junk and keeps tax lines with a %', () => {
+  const r = parseReceipt(`|   1 Burrata Salad          16.00
+:   1 Cashew Chicken         21.75
+CL   3 Iced Tea                9.00
+oo    fl 1 Tiramisu               11.00
+Tax 7.75%                 9.13
+TOTAL                   126.88
+Suggested tip 20%        23.55`);
+  assert.deepEqual(r.items.map(i => [i.name, i.price]), [['1 Burrata Salad', 16], ['1 Cashew Chicken', 21.75], ['3 Iced Tea', 9], ['1 Tiramisu', 11]]);
+  assert.equal(r.tax, 9.13);
+  assert.equal(r.total, 126.88);
+});
+
+test('parser: fixes letters misread as digits in prices', () => {
+  const r = parseReceipt('Pad Thai 14.5O\nSpring Rolls 8.SO\nMango Lassi l2.00');
+  assert.deepEqual(r.items.map(i => [i.name, i.price]), [['Pad Thai', 14.5], ['Spring Rolls', 8.5], ['Mango Lassi', 12]]);
+});
+
+test('parser: drops garbage lines instead of making fake items', () => {
+  const r = parseReceipt('y J a V2 18.77 124.09\n~ ;: 4.20\nBLT Sandwich 11.00');
+  assert.deepEqual(r.items.map(i => i.name), ['BLT Sandwich']);
+});
+
+test('parser: uses the line total when a unit price is also shown', () => {
+  const r = parseReceipt('2 Fish Tacos 7.00 14.00');
+  assert.deepEqual(r.items.map(i => [i.name, i.price]), [['2 Fish Tacos', 14]]);
+});
