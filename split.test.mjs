@@ -1,0 +1,127 @@
+// Copyright (c) 2026 Kaitlin Mae Frani. All rights reserved. See LICENSE.
+// Tests for Split the Slip's money math and receipt parser.
+// Run from the repo folder with:  node --test
+// They read the code straight out of index.html (between the CALC/PARSE markers),
+// so the app stays a single file.
+import { test } from 'node:test';
+import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
+
+const html = readFileSync(new URL('./index.html', import.meta.url), 'utf8');
+const grab = (start, end) => {
+  const m = html.match(new RegExp(`// ===== ${start} =====([\\s\\S]*?)// ===== ${end} =====`));
+  if (!m) throw new Error(`markers ${start}/${end} not found in index.html`);
+  return m[1];
+};
+const { alloc, compute, parseReceipt } = new Function(
+  grab('CALC START', 'CALC END') + grab('PARSE START', 'PARSE END') + 'return { alloc, compute, parseReceipt };'
+)();
+
+const people = (...ids) => ids.map(id => ({ id, name: id }));
+const bill = (over) => ({ people: [], items: [], tax: 0, tipMode: 'amt', tipAmt: 0, tipPct: 0, taxSplit: 'prop', tipSplit: 'prop', ...over });
+const sum = (a) => a.reduce((x, y) => x + y, 0);
+
+// ---------- alloc ----------
+test('alloc: shares always add up to the exact total', () => {
+  for (const [raw, total] of [[[650 / 3, 650 / 3, 650 / 3], 650], [[33.3, 33.3, 33.4], 100], [[0.5, 0.5], 1], [[1000], 1000]]) {
+    assert.equal(sum(alloc(raw, total)), total);
+  }
+});
+
+test('alloc: $6.50 three ways is 2.17, 2.17, 2.16', () => {
+  assert.deepEqual(alloc([650 / 3, 650 / 3, 650 / 3], 650), [217, 217, 216]);
+});
+
+test('alloc: negative totals (discounts) still add up', () => {
+  assert.equal(sum(alloc([-500 / 3, -500 / 3, -500 / 3], -500)), -500);
+});
+
+// ---------- compute ----------
+test('compute: when everything is assigned, people pay exactly the bill', () => {
+  const s = bill({
+    people: people('a', 'b', 'c'),
+    items: [
+      { name: 'Roll', price: 1450, who: ['a'] },
+      { name: 'Ramen', price: 1695, who: ['b'] },
+      { name: 'Edamame', price: 650, who: ['a', 'b', 'c'] },
+      { name: 'Sake', price: 1800, who: ['a', 'c'] },
+    ],
+    tax: 612, tipMode: 'pct', tipPct: 18,
+  });
+  const r = compute(s);
+  assert.equal(sum(r.rows.map(x => x.total)), r.grand);
+  assert.equal(sum(r.rows.map(x => x.tax)), 612);
+});
+
+test('compute: even split divides tax and tip equally (to the cent)', () => {
+  const s = bill({ people: people('a', 'b', 'c'), items: [{ price: 3000, who: ['a'] }], tax: 300, tipAmt: 600, taxSplit: 'even', tipSplit: 'even' });
+  const r = compute(s);
+  assert.deepEqual(r.rows.map(x => x.tax), [100, 100, 100]);
+  assert.deepEqual(r.rows.map(x => x.tip), [200, 200, 200]);
+});
+
+test('compute: nobody pays tax or tip on unassigned items', () => {
+  const s = bill({
+    people: people('a', 'b'),
+    items: [{ price: 1000, who: ['a'] }, { price: 1000, who: ['b'] }, { price: 2000, who: [] }],
+    tax: 400, tipMode: 'pct', tipPct: 20,
+  });
+  const r = compute(s);
+  assert.equal(r.unassigned.length, 1);
+  // assigned half of the bill → half of tax (200) and half of tip (400)
+  assert.equal(sum(r.rows.map(x => x.tax)), 200);
+  assert.equal(sum(r.rows.map(x => x.tip)), 400);
+  assert.deepEqual(r.rows.map(x => x.total), [1300, 1300]);
+});
+
+test('compute: removed people are ignored on items', () => {
+  const s = bill({ people: people('a'), items: [{ price: 1000, who: ['a', 'ghost'] }] });
+  assert.equal(compute(s).rows[0].total, 1000);
+});
+
+test('compute: zero people does not crash', () => {
+  const r = compute(bill({ items: [{ price: 1000, who: [] }], tax: 100 }));
+  assert.deepEqual(r.rows, []);
+  assert.equal(r.grand, 1100);
+});
+
+test('compute: discount shared by everyone lowers everyone', () => {
+  const s = bill({ people: people('a', 'b'), items: [{ price: 2000, who: ['a'] }, { price: 2000, who: ['b'] }, { price: -1000, who: ['a', 'b'] }] });
+  assert.deepEqual(compute(s).rows.map(x => x.total), [1500, 1500]);
+});
+
+// ---------- parseReceipt ----------
+test('parser: keeps food whose names contain payment words', () => {
+  const r = parseReceipt([
+    'Vegetable Tempura 9.50', 'Cashew Chicken 15.25', 'Order of Fries 4.00',
+    'Cardamom Tea 3.50', 'Date Shake 6.00', 'Chicken Ramen 16.95', 'Check Mate Burger 12.00',
+  ].join('\n'));
+  assert.deepEqual(r.items.map(i => i.name), [
+    'Vegetable Tempura', 'Cashew Chicken', 'Order of Fries', 'Cardamom Tea', 'Date Shake', 'Chicken Ramen', 'Check Mate Burger',
+  ]);
+});
+
+test('parser: skips totals, tax, suggested tips and payment lines', () => {
+  const r = parseReceipt(`SAKURA SUSHI BAR
+Server: Kim   Table 7
+Date 11/26/2026 7:42 PM
+Order #1042
+Spicy Tuna Roll        14.50
+Edamame                 6.50
+Subtotal               21.00
+Tax                     1.84
+TOTAL                  22.84
+Suggested tip 18%       3.78
+VISA ****1234          22.84
+Change                  0.00`);
+  assert.deepEqual(r.items.map(i => [i.name, i.price]), [['Spicy Tuna Roll', 14.5], ['Edamame', 6.5]]);
+  assert.equal(r.tax, 1.84);
+  assert.equal(r.total, 22.84);
+  assert.equal(r.tip, 0);
+});
+
+test('parser: reads discounts, $ signs, commas and tax flags', () => {
+  const r = parseReceipt('Burger $12.00\nHappy hour -3.00\nFries 4,50\nSoda 2.50 T\nGratuity 5.00');
+  assert.deepEqual(r.items.map(i => [i.name, i.price]), [['Burger', 12], ['Happy hour', -3], ['Fries', 4.5], ['Soda', 2.5]]);
+  assert.equal(r.tip, 5);
+});

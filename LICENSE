@@ -1,0 +1,88 @@
+Split the Slip — Proprietary License (All Rights Reserved)
+
+Copyright (c) 2026 Kaitlin Mae Frani. All rights reserved.
+
+1. OWNERSHIP
+
+   Split the Slip, including its source code, design, layout, text, and
+   graphics (together, the "Software"), is owned by Kaitlin Mae Frani (the
+   "Owner") and is protected by copyright law. No ownership rights are
+   transferred to you by this license.
+
+2. WHAT YOU MAY DO
+
+   Without asking for permission, you may:
+
+   a. use the Software through its official website published by the Owner
+      to split bills for your own personal purposes; and
+
+   b. view the source code in this repository.
+
+3. WHAT YOU MAY NOT DO
+
+   Unless the Owner gives you prior written permission, you may not:
+
+   a. copy or reproduce the Software or any substantial part of it;
+
+   b. modify, adapt, translate, or create derivative works based on it;
+
+   c. distribute, publish, host, deploy, sublicense, rent, lease, or
+      otherwise make the Software or any copy of it available to others;
+
+   d. sell the Software or use it in any product or service offered for a
+      fee or other commercial benefit; or
+
+   e. remove, hide, or change any copyright notice, license text, or
+      attribution in the Software.
+
+4. COPYRIGHT NOTICE MUST BE KEPT
+
+   If the Owner gives you written permission to copy, change, or use any
+   part of the Software, every copy or portion you make must include the
+   copyright notice above ("Copyright (c) 2026 Kaitlin Mae Frani. All
+   rights reserved.") and a copy of this license, unless the Owner's
+   written permission says otherwise.
+
+5. GITHUB
+
+   This repository is public on GitHub. Under GitHub's Terms of Service,
+   GitHub users may view this repository and fork it on GitHub using
+   GitHub's features. That limited right does not grant any other
+   permission. Forks remain subject to this license, and may not be
+   copied, deployed, published, or used outside of GitHub's service.
+
+6. THIRD-PARTY COMPONENTS
+
+   The Software loads some third-party components (listed in NOTICE.md)
+   that are owned by others and governed by their own licenses. This
+   license does not apply to those components, and nothing in it limits
+   your rights under their licenses.
+
+7. ASKING FOR PERMISSION
+
+   To ask for permission to use the Software in a way this license does
+   not allow, contact Kaitlin Mae Frani through the GitHub profile that
+   owns this repository. Permission is only valid if given in writing by
+   the Owner.
+
+8. NO WARRANTY
+
+   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+   OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+   MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, ACCURACY, AND
+   NONINFRINGEMENT. Amounts calculated by the Software, and items read from
+   receipt photos, may be wrong. You are responsible for checking them
+   before paying or asking others to pay.
+
+9. LIMITATION OF LIABILITY
+
+   IN NO EVENT SHALL THE OWNER BE LIABLE FOR ANY CLAIM, DAMAGES, OR OTHER
+   LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT, OR OTHERWISE, ARISING
+   FROM, OUT OF, OR IN CONNECTION WITH THE SOFTWARE OR THE USE OF OR OTHER
+   DEALINGS IN THE SOFTWARE.
+
+10. TERMINATION
+
+   Any permission you have under this license ends automatically if you
+   break any of its terms. If that happens, you must stop using the
+   Software and destroy any copies you have made.
