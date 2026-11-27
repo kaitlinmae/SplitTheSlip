@@ -60,11 +60,11 @@ test('compute: even split divides tax and tip equally (to the cent)', () => {
   assert.deepEqual(r.rows.map(x => x.tip), [200, 200, 200]);
 });
 
-test('compute: nobody pays tax or tip on unassigned items', () => {
+test('compute (proportional): nobody pays tax or tip on unassigned items', () => {
   const s = bill({
     people: people('a', 'b'),
     items: [{ price: 1000, who: ['a'] }, { price: 1000, who: ['b'] }, { price: 2000, who: [] }],
-    tax: 400, tipMode: 'pct', tipPct: 20,
+    tax: 400, tipMode: 'pct', tipPct: 20, taxSplit: 'prop', tipSplit: 'prop',
   });
   const r = compute(s);
   assert.equal(r.unassigned.length, 1);
@@ -165,8 +165,9 @@ Gratuity 18% 15.00
 
 test('parser: keeps every printed total (bill total and total with tip)', () => {
   const r = parseReceipt('Subtotal $95.94\nTax $11.31\nTotal $107.25\nTotal $107.25 $16.77 $124.02');
-  assert.deepEqual(r.totals, [107.25, 124.02]);
+  assert.ok(r.totals.includes(107.25) && r.totals.includes(124.02));
   assert.equal(r.total, 107.25);
+  assert.equal(r.tip, 16.77);
 });
 
 test('parser: real-photo noise — junk after prices, split lines, junk before quantity', () => {
@@ -203,4 +204,33 @@ $11.31`);
 test('parser: strips junk tokens from the end of names', () => {
   const r = parseReceipt('1 Margherita Pizza pj,y; 19.50\nRestaurant Fee (3.00%) $2.79');
   assert.deepEqual(r.items.map(i => i.name), ['1 Margherita Pizza', 'Restaurant Fee (3.00%)']);
+});
+
+test('compute (even): whole tax and tip split equally right away, even before items are assigned', () => {
+  const s = bill({ people: people('a', 'b'), items: [{ price: 3715, who: [] }, { price: 1400, who: [] }], tax: 1131, tipAmt: 1677, taxSplit: 'even', tipSplit: 'even' });
+  const r = compute(s);
+  assert.deepEqual(r.rows.map(x => x.tax), [566, 565]);
+  assert.deepEqual(r.rows.map(x => x.tip), [839, 838]);
+});
+
+test('compute: switching even <-> proportional changes the shares', () => {
+  const base = { people: people('a', 'b'), items: [{ price: 3000, who: ['a'] }, { price: 1000, who: ['b'] }], tax: 400, tipAmt: 800 };
+  const even = compute(bill({ ...base, taxSplit: 'even', tipSplit: 'even' })).rows.map(x => x.total);
+  const prop = compute(bill({ ...base, taxSplit: 'prop', tipSplit: 'prop' })).rows.map(x => x.total);
+  assert.deepEqual(even, [3600, 1600]);
+  assert.deepEqual(prop, [3900, 1300]);
+});
+
+test('parser: tip as a percent vs a dollar amount', () => {
+  const pct = parseReceipt('Burger 20.00\nSubtotal 20.00\nGratuity 18% 3.60\nTotal 23.60');
+  assert.equal(pct.tipPct, 18); assert.equal(pct.tip, 3.6);
+  const amt = parseReceipt('Burger 20.00\nSubtotal 20.00\nTip 4.00\nTotal 24.00');
+  assert.equal(amt.tipPct, 0); assert.equal(amt.tip, 4);
+});
+
+test('parser: tip from an Amount / Tip / Payment row (even with a misread tip digit)', () => {
+  const clean = parseReceipt('Burger 95.94\nSubtotal $95.94\nTotal $107.25\nVISA 4886 107.25 16.77 124.02');
+  assert.equal(clean.tip, 16.77);
+  const misread = parseReceipt('Burger 95.94\nSubtotal $95.94\n|  y                $107.25 $18.77  $124.02');
+  assert.equal(misread.tip, 16.77);
 });

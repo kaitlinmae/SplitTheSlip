@@ -156,13 +156,14 @@ textarea.fallback{width:100%;min-height:120px;margin-top:8px;font:13px "IBM Plex
 
  <section class="slip" aria-labelledby="h-tax">
   <h2 id="h-tax"><span class="n">3</span>Tax &amp; tip</h2>
-  <p class="hint">Proportional means you pay more tax and tip if you ordered more.</p>
+  <p class="hint">Even splits tax and tip equally. Proportional means you pay more if you ordered more.</p>
   <div class="settings">
    <div class="setting"><label class="lbl" for="tax">Tax</label>
-    <div class="field"><input id="tax" class="price" inputmode="decimal" placeholder="0.00"><div class="seg" data-key="taxSplit"><button type="button" data-v="prop">Proportional</button><button type="button" data-v="even">Even</button></div></div></div>
+    <div class="field"><input id="tax" class="price" inputmode="decimal" placeholder="0.00"><div class="seg" data-key="taxSplit"><button type="button" data-v="even">Even</button><button type="button" data-v="prop">Proportional</button></div></div></div>
    <div class="setting"><label class="lbl" for="tip">Tip</label>
-    <div class="field"><input id="tip" class="price" inputmode="decimal" placeholder="0"><div class="seg" data-key="tipMode"><button type="button" data-v="pct">%</button><button type="button" data-v="amt">$</button></div><div class="seg" data-key="tipSplit"><button type="button" data-v="prop">Proportional</button><button type="button" data-v="even">Even</button></div></div></div>
+    <div class="field"><input id="tip" class="price" inputmode="decimal" placeholder="0"><div class="seg" data-key="tipMode"><button type="button" data-v="pct">%</button><button type="button" data-v="amt">$</button></div><div class="seg" data-key="tipSplit"><button type="button" data-v="even">Even</button><button type="button" data-v="prop">Proportional</button></div></div></div>
   </div>
+  <p class="warnline" id="propNote" hidden>Proportional shares of tax and tip show up as you assign items to people.</p>
   <div class="check"><span>Bill total</span><span class="price" id="grand">$0.00</span></div>
  </section>
 
@@ -204,9 +205,11 @@ function compute(s){
     const prop = mode==='prop' && assignedSub>0;
     return alloc(P.map((_,i)=> prop ? amt*rawItems[i]/assignedSub : amt/n), amt);
   };
-  // Tax & tip on unassigned items are not charged to anyone until those items are assigned.
+  // Even: everyone pays an equal share of the whole tax/tip, straight away.
+  // Proportional: tax & tip on unassigned items aren't charged to anyone until those items are assigned.
   const scale = fullSub>0 ? Math.min(1, Math.max(0, assignedSub/fullSub)) : (unassigned.length ? 0 : 1);
-  const taxC = share(Math.round((s.tax||0)*scale), s.taxSplit), tipC = share(Math.round(tip*scale), s.tipSplit);
+  const part = (amt, mode) => mode==='even' ? amt : Math.round(amt*scale);
+  const taxC = share(part(s.tax||0, s.taxSplit), s.taxSplit), tipC = share(part(tip, s.tipSplit), s.tipSplit);
   const rows = P.map((p,i)=>({id:p.id, name:p.name, items:itemCents[i], tax:taxC[i], tip:tipC[i], total:itemCents[i]+taxC[i]+tipC[i], lines:lines[i]}));
   return {rows, fullSub, assignedSub, tip, grand: fullSub+(s.tax||0)+tip, unassigned};
 }
@@ -220,12 +223,12 @@ const uid = () => Math.random().toString(36).slice(2,9);
 
 const SAMPLE = () => {
   const a={id:uid(),name:'Alex'}, s={id:uid(),name:'Sam'}, j={id:uid(),name:'Jordan'};
-  return {sample:true, people:[a,s,j], payer:a.id, tax:612, tipPct:18, tipAmt:0, tipMode:'pct', taxSplit:'prop', tipSplit:'prop',
+  return {sample:true, people:[a,s,j], payer:a.id, tax:612, tipPct:18, tipAmt:0, tipMode:'pct', taxSplit:'even', tipSplit:'even',
    items:[{id:uid(),name:'Spicy tuna roll',price:1450,who:[a.id]},{id:uid(),name:'Chicken ramen',price:1695,who:[s.id]},
           {id:uid(),name:'Wagyu don',price:2800,who:[j.id]},{id:uid(),name:'Edamame',price:650,who:[a.id,s.id,j.id]},
           {id:uid(),name:'Sake carafe',price:1800,who:[a.id,j.id]}]};
 };
-const BLANK = () => ({sample:false, people:[], payer:null, tax:0, tipPct:18, tipAmt:0, tipMode:'pct', taxSplit:'prop', tipSplit:'prop', items:[]});
+const BLANK = () => ({sample:false, people:[], payer:null, tax:0, tipPct:18, tipAmt:0, tipMode:'pct', taxSplit:'even', tipSplit:'even', items:[]});
 
 function normalize(s){
   if(!s || typeof s!=='object' || !Array.isArray(s.items)) return SAMPLE();
@@ -235,7 +238,7 @@ function normalize(s){
   for(const k of ['tax','tipAmt']) s[k] = Number.isFinite(s[k]) ? Math.max(0,Math.round(s[k])) : 0;
   s.tipPct = Number.isFinite(s.tipPct) ? Math.min(100,Math.max(0,s.tipPct)) : b.tipPct;
   if(!['pct','amt'].includes(s.tipMode)) s.tipMode = b.tipMode;
-  for(const k of ['taxSplit','tipSplit']) if(!['prop','even'].includes(s[k])) s[k] = 'prop';
+  for(const k of ['taxSplit','tipSplit']) if(!['prop','even'].includes(s[k])) s[k] = 'even';
   if(!s.people.some(p=>p.id===s.payer)) s.payer = s.people[0]?.id || null;
   return s;
 }
@@ -299,6 +302,7 @@ function renderTotals(){
     const fb = document.querySelector('#fallbackBox textarea'); if(fb) fb.value = lastSummary;
   }
   const nU = r.unassigned.length;
+  $('propNote').hidden = !(nU && S.people.length && ((S.taxSplit==='prop' && S.tax) || (S.tipSplit==='prop' && r.tip)));
   $('copy').disabled = !lastSummary || nU>0;
   $('copy').textContent = nU ? `Assign ${nU} item${nU>1?'s':''} first` : 'Copy for group chat';
   $('sampleNote').hidden = !S.sample;
@@ -407,7 +411,7 @@ function looksLikeName(name){
   return words.length > 0 && letters.length/chars.length >= 0.55;
 }
 function parseReceipt(text){
-  const out={items:[], tax:0, tip:0, total:0, totals:[], subtotal:0};
+  const out={items:[], tax:0, tip:0, tipPct:0, total:0, totals:[], subtotal:0};
   let pending = '';   // a name line whose price ended up on the next line
   let pastItems = false;   // below Subtotal only tax, totals and payment lines follow
   const PRICE = /(-)?\$?\s?([\dOoDQSsIl|iBZz]{1,4})\s?[.,]\s?([\dOoDQSsIl|iBZz]{2})(?![\d%])\s*(-)?/g;
@@ -422,6 +426,17 @@ function parseReceipt(text){
     let price = +digits; if(m[1]||m[4]) price = -price;
     // an item line can also show a unit price before the line total ("2 Tacos 7.00 14.00")
     const rawName = line.slice(0,m.index).replace(/\s\$?\d{1,4}[.,]\d{2}\s*$/,'');
+    // "Amount  Tip  Payment" row, e.g. "$107.25 $16.77 $124.02": tip = paid total − bill total
+    if(pastItems){
+      const all = [...line.matchAll(PRICE)].filter(x=>/\d/.test(x[2])).map(x=>+(fixDigits(x[2])+'.'+fixDigits(x[3]))).filter(v=>isFinite(v));
+      if(all.length >= 3){
+        const a=all[0], b=all[all.length-2], c=all[all.length-1];
+        if(c>a && Math.abs(c-a-b) <= Math.max(2, b*0.2)){
+          if(!out.tip) out.tip = Math.round((c-a)*100)/100;
+          out.totals.push(a, c); out.total = out.total || a; continue;
+        }
+      }
+    }
     let name = cleanName(rawName);
     // below Subtotal, only borrow a short label line ("Tax", "Total") — never e.g. "VISA 4886 Tip Payment"
     if(!looksLikeName(name) && pending && (!pastItems || (/sub\s*-?\s*total|\btax\b|\btotal\b|\btip\b|gratuity/i.test(pending) && !/visa|master|amex|card|payment|amount|cash/i.test(pending)))) name = pending;
@@ -431,7 +446,7 @@ function parseReceipt(text){
     if(/\b(tax|hst|gst|pst|vat)\b/.test(low)){ out.tax += price; continue; }
     const lineLow = line.toLowerCase();
     if(/suggest/.test(lineLow) || (/%/.test(lineLow) && /\btip\b/.test(lineLow))) continue;  // suggested-tip tables, not real charges
-    if(/\btip\b|gratuity|service charge/.test(low)){ out.tip += price; continue; }
+    if(/\btip\b|gratuity|service charge/.test(low)){ out.tip += price; const pm = lineLow.match(/(\d{1,2}(?:\.\d+)?)\s?%/); if(pm) out.tipPct = +pm[1]; continue; }
     if(/total|balance|amount due|\bdue\b/.test(low)){ out.totals.push(price); out.total = out.total || price; continue; }
     if(pastItems || RECEIPT_SKIP.test(name)) continue;
     if(!looksLikeName(name)) continue;
@@ -618,10 +633,10 @@ function askAddOrReplace(nFound, nHave){
 }
 const PROMPT = `You read restaurant receipts. Extract every ordered line item from the attached receipt photo.
 Return ONLY JSON, no prose, in this shape:
-{"items":[{"name":"string","price":12.50}],"tax":1.23,"tip":0,"total":45.67}
+{"items":[{"name":"string","price":12.50}],"tax":1.23,"tip":0,"tipPct":0,"total":45.67}
 Rules: price is the line total in dollars (quantity x unit price). Expand nothing; keep one entry per printed line.
 Discounts are items with negative prices. Do not include subtotal, tax, tip, gratuity, or total lines as items.
-If tax, tip, or total is not printed, use 0. If the image is not a receipt, return {"items":[]}.`;
+tip is the tip or gratuity amount actually charged; tipPct is its percentage only if the receipt prints one (ignore suggested-tip tables). If tax, tip, or total is not printed, use 0. If the image is not a receipt, return {"items":[]}.`;
 $('file').addEventListener('change', async e=>{
   const f=e.target.files[0]; e.target.value=''; if(!f || scanning) return;
   if(!scanMode){ status('Getting the scanner ready. Try again in a moment.'); return; }
@@ -638,20 +653,22 @@ $('file').addEventListener('change', async e=>{
     if(!items.length){ status('Couldn’t find items on that photo. Try a sharper, flatter shot, or add items by hand.', true); return; }
     const taxC = isFinite(+data.tax) && +data.tax>0 ? Math.round(+data.tax*100) : 0;
     const tipC = isFinite(+data.tip) && +data.tip>0 ? Math.round(+data.tip*100) : 0;
+    const tipPctR = isFinite(+data.tipPct) && +data.tipPct>0 && +data.tipPct<=100 ? +data.tipPct : 0;
     const hasOwn = !S.sample && S.items.length>0;
     const choice = hasOwn ? (status(''), await askAddOrReplace(items.length, S.items.length)) : 'replace';
     const prev = JSON.stringify(S);
     if(choice==='add'){
       S.items = [...S.items, ...items];
       S.tax = (S.tax||0) + taxC;
-      if(tipC && S.tipMode==='amt') S.tipAmt = (S.tipAmt||0) + tipC;
+      if(tipC){ if(S.tipMode!=='amt'){ S.tipMode='amt'; S.tipAmt=0; } S.tipAmt = (S.tipAmt||0) + tipC; }
     } else {
       const keepPeople = S.sample ? [] : S.people;
       S = {...(S.sample?BLANK():S), sample:false, people:keepPeople, payer:keepPeople.some(p=>p.id===S.payer)?S.payer:(keepPeople[0]?.id||null), items};
       if(taxC) S.tax = taxC;
-      if(tipC){ S.tipMode='amt'; S.tipAmt=tipC; }
+      if(tipPctR){ S.tipMode='pct'; S.tipPct=tipPctR; } else if(tipC){ S.tipMode='amt'; S.tipAmt=tipC; }
     }
     renderAll();
+    const tipNote = (choice!=='add' && tipPctR) ? ` Tip set to ${tipPctR}% from the receipt.` : tipC ? ` Tip set to ${money(tipC)} from the receipt.` : '';
     if(hasOwn) showUndo(choice==='add' ? `Added ${items.length} item${items.length>1?'s':''}.` : 'Replaced your items.', prev);
     const printed = items.reduce((a,i)=>a+i.price,0) + taxC + tipC;
     const totals = (Array.isArray(data.totals) && data.totals.length ? data.totals : [data.total]).map(t=>Math.round((+t||0)*100)).filter(t=>t>0);
@@ -660,6 +677,7 @@ $('file').addEventListener('change', async e=>{
     const noTax = taxC ? '' : ' Couldn’t read the tax, so enter it in Tax & tip.';
     if(sub && Math.abs(sub-itemsSum)<=1){ status(`Found ${items.length} item${items.length===1?'':'s'}. They add up to the receipt’s subtotal (${money(sub)}).`+noTax+(usedOcr?' Check the names and prices.':'')); }
     else status(`Found ${items.length} item${items.length===1?'':'s'}.` + (tot && Math.abs(tot-printed)>1 ? ` Receipt total ${money(tot)} vs ${money(printed)} here — some items may be missing or misread.` : usedOcr ? ' Photo reading can slip up, so check each name and price.' : ' Check them against the receipt.'), !!(tot && Math.abs(tot-printed)>1));
+    if(tipNote) $('scanStatus').textContent += tipNote;
   }catch(err){
     if(err && err.code==='rate_limited'){ status('Too many scans right now. Wait a minute and try again.', true); }
     else status(err && err.message && !/parse|encode/.test(err.message) ? err.message : 'Couldn’t read that receipt. Try again or add items by hand.', true);
